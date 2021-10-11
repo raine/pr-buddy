@@ -20,7 +20,7 @@ module.exports = merge(baseConfig, {
   mode: 'development',
   target: 'electron-renderer',
   externals: ['fsevents', 'crypto-browserify'],
-  module: require('./webpack.config.renderer.dev').default.module,
+  module: require('./webpack.config.renderer.dev').module,
   entry: {
     renderer: Object.keys(dependencies || {})
   },
