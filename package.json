@@ -1,6 +1,6 @@
 {
-  "name": "electron-react-boilerplate",
-  "productName": "ElectronReact",
+  "name": "pr-buddy",
+  "productName": "PrBuddy",
   "scripts": {
     "build": "concurrently 'yarn build:main' 'yarn build:renderer'",
     "build:main": "NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./erb/configs/webpack.config.main.prod.js",
@@ -12,11 +12,12 @@
     "dev": "node ./erb/scripts/check-port-in-use.js && yarn dev:renderer",
     "dev:main": "NODE_ENV=development electron -r ts-node/register/transpile-only ./src/main/main.ts",
     "dev:renderer": "NODE_ENV=development webpack serve --config ./erb/configs/webpack.config.renderer.dev.js",
+    "dev:script": "ts-node-dev --files --no-notify --respawn --project tsconfig.json",
     "format": "prettier --write ."
   },
   "build": {
-    "productName": "ElectronReact",
-    "appId": "org.erb.ElectronReact",
+    "productName": "PrBuddy",
+    "appId": "dev.raine.PrBuddy",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
@@ -76,6 +77,8 @@
     "@pmmmwh/react-refresh-webpack-plugin": "0.5.1",
     "@teamsupercell/typings-for-css-modules-loader": "^2.5.1",
     "@types/history": "4.7.9",
+    "@types/ini": "^1.3.31",
+    "@types/lodash": "^4.14.175",
     "@types/node": "16.10.2",
     "@types/react": "^17.0.27",
     "@types/react-dom": "^17.0.9",
@@ -119,6 +122,7 @@
     "terser-webpack-plugin": "^5.2.4",
     "ts-loader": "^9.2.6",
     "ts-node": "^10.2.1",
+    "ts-node-dev": "^1.1.8",
     "typescript": "^4.4.3",
     "url-loader": "^4.1.1",
     "webpack": "^5.56.1",
@@ -128,10 +132,15 @@
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {
+    "@octokit/graphql": "^4.8.0",
     "electron-debug": "^3.2.0",
     "electron-log": "^4.4.1",
+    "electron-settings": "^4.0.2",
     "electron-updater": "^4.3.9",
     "history": "4.x.x",
+    "ini": "^2.0.0",
+    "lodash": "^4.17.21",
+    "p-reduce": "^2.1.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-router-dom": "^5.3.0",

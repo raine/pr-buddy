@@ -1,7 +1,7 @@
-import { FetchPullRequests } from '../main/main'
+import { fetchPullRequests } from '../main/api'
 
 export interface ElectronAPI {
-  fetchPullRequests: () => FetchPullRequests
+  fetchPullRequests: () => ReturnType<typeof fetchPullRequests>
 }
 
 declare global {

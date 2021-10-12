@@ -6,36 +6,18 @@
  * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
+import './fix-dev-user-data'
 import 'core-js/stable'
 import 'regenerator-runtime/runtime'
 import path from 'path'
-import { app, BrowserWindow, shell, ipcMain } from 'electron'
+import { app, BrowserWindow, shell } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import log from 'electron-log'
 import buildMenu from './menu'
 import { resolveHtmlPath } from './util'
-import * as fs from 'fs/promises'
-import { LatestPullRequestsStatuses, GithubUser } from '../github'
+import './api'
 
 let mainWindow: BrowserWindow | null = null
-
-export type FetchPullRequests = Promise<{
-  loggedInUser: GithubUser
-  pullRequests: LatestPullRequestsStatuses
-}>
-export async function fetchPullRequests(): FetchPullRequests {
-  return {
-    loggedInUser: {
-      login: 'Raine-Virta',
-      name: 'Raine Virta'
-    },
-    pullRequests: await fs
-      .readFile(path.resolve(__dirname, '../../data.json'), 'utf8')
-      .then((str) => JSON.parse(str))
-  }
-}
-
-ipcMain.handle('fetchPullRequests', fetchPullRequests)
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support')
