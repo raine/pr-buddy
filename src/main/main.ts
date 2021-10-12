@@ -14,14 +14,28 @@ import { autoUpdater } from 'electron-updater'
 import log from 'electron-log'
 import buildMenu from './menu'
 import { resolveHtmlPath } from './util'
+import * as fs from 'fs/promises'
+import { LatestPullRequestsStatuses, GithubUser } from '../github'
 
 let mainWindow: BrowserWindow | null = null
 
-ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`
-  console.log(msgTemplate(arg))
-  event.reply('ipc-example', msgTemplate('pong'))
-})
+export type FetchPullRequests = Promise<{
+  loggedInUser: GithubUser
+  pullRequests: LatestPullRequestsStatuses
+}>
+export async function fetchPullRequests(): FetchPullRequests {
+  return {
+    loggedInUser: {
+      login: 'Raine-Virta',
+      name: 'Raine Virta'
+    },
+    pullRequests: await fs
+      .readFile(path.resolve(__dirname, '../../data.json'), 'utf8')
+      .then((str) => JSON.parse(str))
+  }
+}
+
+ipcMain.handle('fetchPullRequests', fetchPullRequests)
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support')
@@ -59,9 +73,9 @@ const createWindow = async () => {
     path.join(RESOURCES_PATH, ...paths)
 
   mainWindow = new BrowserWindow({
-    show: false,
-    width: 1024,
-    height: 728,
+    show: true,
+    width: 512,
+    height: 364,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')

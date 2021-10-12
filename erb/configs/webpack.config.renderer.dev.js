@@ -66,23 +66,15 @@ module.exports = merge(baseConfig, {
       {
         test: /\.global\.css$/,
         use: [
-          {
-            loader: 'style-loader'
-          },
-          {
-            loader: 'css-loader',
-            options: {
-              sourceMap: true
-            }
-          }
+          { loader: 'style-loader' },
+          { loader: 'css-loader', options: { sourceMap: true } },
+          { loader: 'postcss-loader' }
         ]
       },
       {
         test: /^((?!\.global).)*\.css$/,
         use: [
-          {
-            loader: 'style-loader'
-          },
+          { loader: 'style-loader' },
           {
             loader: 'css-loader',
             options: {
@@ -99,18 +91,12 @@ module.exports = merge(baseConfig, {
       {
         test: /\.global\.(scss|sass)$/,
         use: [
-          {
-            loader: 'style-loader'
-          },
+          { loader: 'style-loader' },
           {
             loader: 'css-loader',
-            options: {
-              sourceMap: true
-            }
+            options: { sourceMap: true }
           },
-          {
-            loader: 'sass-loader'
-          }
+          { loader: 'sass-loader' }
         ]
       },
       // SASS support - compile all other .scss files and pipe it to style.css
@@ -246,7 +232,9 @@ module.exports = merge(baseConfig, {
       env: process.env.NODE_ENV,
       isDevelopment: process.env.NODE_ENV !== 'production',
       nodeModules: webpackPaths.appNodeModulesPath
-    })
+    }),
+
+    new webpack.ProgressPlugin()
   ],
 
   node: {
