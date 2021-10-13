@@ -57,17 +57,18 @@ export const isBranchUpToDate = async (
 
 const trimmedStdout = (out: ExecResult): string => out.stdout.trim()
 
-const rebase = async (git: GitCommand, base: string, branch: string) => {
+export const rebase = async (git: GitCommand, base: string, branch: string) => {
   let stashed = false
   if (await isDirtyWorkingTree(git)) {
     await git(`stash push -m "TEMP"`)
     stashed = true
   }
   const currentBranch = trimmedStdout(await git(`rev-parse --abbrev-ref HEAD`))
-  if (currentBranch !== branch) await git(`checkout ${branch}`)
+  await git(`checkout origin/${branch}`)
   const { code: rebaseExitCode } = await git(`rebase ${base}`)
   if (rebaseExitCode > 0) await git(`rebase --abort`)
-  if (currentBranch !== branch) await git(`checkout ${currentBranch}`)
+  await git(`push --force origin HEAD:${branch}`)
+  await git(`checkout ${currentBranch}`)
   if (stashed) await git(`stash pop`)
 }
 
@@ -78,16 +79,3 @@ export const fetchBranches = async (
 ): Promise<void> => {
   await git(`fetch ${remote} ${branches.join(' ')}`)
 }
-
-// async function main() {
-//   // const gitDir = '/Users/raine/code/temp/repos/git-testing/clone1'
-//   const gitDir = '/Users/raine/Work/epicgames/devportal-src'
-//   const git = makeGit(gitDir)
-//   // const branch = 'feature'
-//   const branch = 'release-mf-player-moderation'
-//   await git('fetch')
-//   if (!(await isBranchUpToDate(git, 'origin/master', branch))) {
-//     await rebase(git, 'origin/master', branch)
-//   }
-// }
-// main().catch((err) => console.log(err))

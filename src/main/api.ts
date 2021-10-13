@@ -12,7 +12,8 @@ import {
   fetchBranches,
   getRepositoryRemoteData,
   isBranchUpToDate,
-  makeGit
+  makeGit,
+  rebase
 } from './git'
 
 import pReduce from 'p-reduce'
@@ -51,7 +52,7 @@ export async function fetchPullRequests(): Promise<FetchPullRequests> {
       [pr.headRefName]: await isBranchUpToDate(
         git,
         `${remote.name}/${pr.baseRefName}`,
-        pr.headRefName
+        `${remote.name}/${pr.headRefName}`
       )
     }),
     {}
@@ -63,4 +64,17 @@ export async function fetchPullRequests(): Promise<FetchPullRequests> {
   }
 }
 
+export async function rebaseBranchOnLatestBase(
+  headRefName: string,
+  baseRefName: string
+): Promise<void> {
+  const { repositoryPath } = await settings.get()
+  const git = makeGit(repositoryPath)
+  await fetchBranches(git, 'origin', [baseRefName, headRefName])
+  await rebase(git, baseRefName, headRefName)
+}
+
 ipcMain.handle('fetchPullRequests', fetchPullRequests)
+ipcMain.handle('rebaseBranchOnLatestBase', (event, headRefName, baseRefName) =>
+  rebaseBranchOnLatestBase(headRefName, baseRefName)
+)

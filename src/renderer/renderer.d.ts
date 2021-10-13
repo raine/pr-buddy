@@ -1,7 +1,8 @@
-import { fetchPullRequests } from '../main/api'
+import { fetchPullRequests, rebaseBranchOnLatestBase } from '../main/api'
 
 export interface ElectronAPI {
-  fetchPullRequests: () => ReturnType<typeof fetchPullRequests>
+  fetchPullRequests: typeof fetchPullRequests
+  rebaseBranchOnLatestBase: typeof rebaseBranchOnLatestBase
 }
 
 declare global {

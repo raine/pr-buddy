@@ -1,6 +1,13 @@
 import React from 'react'
+import { ReactQueryDevtools } from 'react-query/devtools'
 import './App.global.css'
-import { useQuery, QueryClient, QueryClientProvider } from 'react-query'
+import {
+  useQuery,
+  QueryClient,
+  QueryClientProvider,
+  useMutation,
+  useQueryClient
+} from 'react-query'
 import { PullRequest, StatusState } from '../main/github'
 import classNames from 'classnames'
 import { LocalBranchesUpToDateMap } from '../main/api'
@@ -69,7 +76,12 @@ function PullRequestListItem({
   baseRefName,
   localBranchesUpToDateMap
 }: PullRequest & { localBranchesUpToDateMap: LocalBranchesUpToDateMap }) {
+  const queryClient = useQueryClient()
   const isUpToDateWithBase = localBranchesUpToDateMap[headRefName]
+  const rebaseMutation = useMutation(
+    () => window.electronAPI.rebaseBranchOnLatestBase(headRefName, baseRefName),
+    { onSuccess: () => queryClient.invalidateQueries('pull-requests') }
+  )
 
   return (
     <div className="mb-4 border-gray-100 border rounded-md p-3">
@@ -94,7 +106,11 @@ function PullRequestListItem({
         </div>
         <div className="ml-5 flex flex-col w-[9rem]">
           {!isUpToDateWithBase ? (
-            <button className="px-5 py-2 rounded-md font-medium border transition text-indigo-500 border-indigo-300 bg-white hover:text-white hover:border-indigo-400 hover:bg-indigo-400 active:border-indigo-700 active:bg-indigo-700 focus:ring-green-300">
+            <button
+              onClick={() => rebaseMutation.mutate()}
+              className="px-5 bg-gray-50 hover:bg-gray-100 py-2 transition active:shadow-inner font-medium rounded-md text-normal border shadow-sm text-gray-600 border-gray-300 disabled:opacity-50 disabled:pointer-events-none"
+              disabled={rebaseMutation.isLoading}
+            >
               Rebase on latest master
             </button>
           ) : null}
@@ -108,8 +124,6 @@ function PullRequestList() {
   const query = useQuery('pull-requests', () =>
     window.electronAPI.fetchPullRequests()
   )
-
-  console.log(query.data)
 
   if (query.isLoading) {
     return <div>Loading...</div>
