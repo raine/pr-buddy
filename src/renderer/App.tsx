@@ -36,7 +36,8 @@ function PullRequestListItem({
   commit,
   headRefName,
   baseRefName,
-  localBranchesUpToDateMap
+  localBranchesUpToDateMap,
+  url
 }: PullRequest & { localBranchesUpToDateMap: LocalBranchesUpToDateMap }) {
   const queryClient = useQueryClient()
   const isUpToDateWithBase = localBranchesUpToDateMap[headRefName]
@@ -56,7 +57,10 @@ function PullRequestListItem({
       <div className="flex">
         <div className="flex-grow">
           <div className="text-md leading-snug text-gray-800 font-medium">
-            {title} <span className="font-normal text-gray-600">#{number}</span>
+            <a target="_blank" href={url}>
+              {title}{' '}
+              <span className="font-normal text-gray-600">#{number}</span>
+            </a>
           </div>
           <div className="flex my-2">
             {commit.status !== null || commit.flattenedCheckRuns?.length ? (
