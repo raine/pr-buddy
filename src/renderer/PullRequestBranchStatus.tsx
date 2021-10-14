@@ -65,9 +65,15 @@ export default function PullRequestBranchStatus(
           .with({ status: 'GIT_FETCH' }, () => <>Fetching the remote...</>)
           .with({ status: 'REBASE' }, () => <>Rebasing on {baseRefName}...</>)
           .with({ status: 'GIT_PUSH' }, () => <>Pushing, with force...</>)
-          .with({ status: 'REBASE_PROGRESS', info: __.string }, (message) => (
-            <>{message.info}</>
-          ))
+          .with(
+            { status: 'REBASE_PROGRESS' },
+            ({ info: { currentRebaseStep, totalRebaseSteps } }) => (
+              <>
+                Rebasing on {baseRefName}...{' '}
+                {`(${currentRebaseStep}/${totalRebaseSteps})`}
+              </>
+            )
+          )
           .with({ status: 'COMPLETE' }, def)
           .otherwise(def)
       )

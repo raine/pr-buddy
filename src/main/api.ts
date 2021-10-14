@@ -46,7 +46,10 @@ export type RebaseMessageData =
       type: 'REBASE'
       branch: string
       status: 'REBASE_PROGRESS'
-      info: string
+      info: {
+        currentRebaseStep: number
+        totalRebaseSteps: number
+      }
     }
 
 export type RebaseStatus = RebaseMessageData['status']
@@ -59,7 +62,7 @@ export type MessageData = RebaseMessageData | FetchPullRequestsMessageData
 
 export type MessageListener = (data: MessageData) => void
 
-function emitMessage(data: MessageData) {
+export function emitMessage(data: MessageData) {
   mainWindow?.webContents.send('message', data)
 }
 
@@ -109,21 +112,13 @@ export async function rebaseBranchOnLatestBase(
 ): Promise<
   { result: 'OK' } | { result: 'FAILED_TO_REBASE'; message: string | undefined }
 > {
-  const emit = (status: RebaseStatus, info?: string): void => {
-    if (status === 'REBASE_PROGRESS') {
-      emitMessage({ type: 'REBASE', branch: headRefName, status, info: info! })
-    } else {
-      emitMessage({ type: 'REBASE', branch: headRefName, status })
-    }
-  }
-
   const { repositoryPath } = await settings.get()
   const git = makeGit(repositoryPath)
-  emit('GIT_FETCH')
+  emitMessage({ type: 'REBASE', branch: headRefName, status: 'GIT_FETCH' })
   await fetchBranches(git, 'origin', [baseRefName, headRefName])
-  emit('REBASE')
-  return rebase(emit, git, baseRefName, headRefName).finally(() => {
-    emit('COMPLETE')
+  emitMessage({ type: 'REBASE', branch: headRefName, status: 'REBASE' })
+  return rebase(emitMessage, git, baseRefName, headRefName).finally(() => {
+    emitMessage({ type: 'REBASE', branch: headRefName, status: 'COMPLETE' })
   })
 }
 

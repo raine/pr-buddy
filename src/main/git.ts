@@ -3,7 +3,7 @@ import * as cp from 'child_process'
 import * as fs from 'fs/promises'
 import ini from 'ini'
 import { exec, ExecResult, spawn } from './sh'
-import { RebaseStatus } from './api'
+import { MessageData, RebaseStatus } from './api'
 
 export async function readRepositoryGitConfig(repoPath: string) {
   const configPath = path.join(repoPath, '.git/config')
@@ -65,7 +65,7 @@ export const isBranchUpToDate = async (
 const trimmedStdout = (out: ExecResult): string => out.stdout.trim()
 
 export const rebase = async (
-  emit: (status: RebaseStatus, info?: string) => void,
+  emitMessage: (data: MessageData) => void,
   git: GitCommand,
   base: string,
   branch: string
@@ -86,12 +86,22 @@ export const rebase = async (
   const { code: rebaseExitCode, stderr } = await git.spawn(
     `rebase ${base}`,
     (outputLine) => {
-      const m = outputLine.match(/^Rebasing.*/)
-      if (m) emit('REBASE_PROGRESS', m[0].trim())
+      const m = outputLine.match(/^Rebasing \((\d+)\/(\d+)\)/)
+      if (m) {
+        emitMessage({
+          type: 'REBASE',
+          branch,
+          status: 'REBASE_PROGRESS',
+          info: {
+            currentRebaseStep: parseInt(m[1]),
+            totalRebaseSteps: parseInt(m[2])
+          }
+        })
+      }
     }
   )
   if (rebaseExitCode > 0) {
-    const couldNotApply = stderr.match(/.*\rerror: could not apply.*/)
+    const couldNotApply = stderr.match(/error: could not apply.*/)
     await git(`rebase --abort`)
     await git(`checkout ${currentBranch}`)
     return {
@@ -99,8 +109,8 @@ export const rebase = async (
       message: couldNotApply?.[0]
     }
   } else {
-    emit('GIT_PUSH')
-    // await git(`push --force origin HEAD:${branch}`)
+    emitMessage({ type: 'REBASE', branch, status: 'GIT_PUSH' })
+    await git(`push --dry-run --force origin HEAD:${branch}`)
     await git(`checkout ${currentBranch}`)
     if (stashed) await git(`stash pop`)
     return { result: 'OK' as const }
