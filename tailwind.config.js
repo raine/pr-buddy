@@ -13,6 +13,9 @@ module.exports = {
         'status-red': '#CB2431',
         'status-green': '#28A745',
         'status-yellow': '#DBAB07'
+      },
+      animation: {
+        pulse: 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite'
       }
     }
   },

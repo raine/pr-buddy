@@ -81,13 +81,14 @@ export const rebase = async (
   if (rebaseExitCode > 0) {
     const couldNotApply = stderr.match(/.*\rerror: could not apply.*/)
     await git(`rebase --abort`)
+    await git(`checkout ${currentBranch}`)
     return {
       result: 'FAILED_TO_REBASE' as const,
       message: couldNotApply?.[0]
     }
   } else {
     emit('GIT_PUSH')
-    // await git(`push --force origin HEAD:${branch}`)
+    await git(`push --force origin HEAD:${branch}`)
     await git(`checkout ${currentBranch}`)
     if (stashed) await git(`stash pop`)
     return { result: 'OK' as const }

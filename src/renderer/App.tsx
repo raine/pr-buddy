@@ -1,5 +1,3 @@
-import { match, __ } from 'ts-pattern'
-import classNames from 'classnames'
 import React from 'react'
 import {
   QueryClient,
@@ -8,11 +6,13 @@ import {
   useQuery,
   useQueryClient
 } from 'react-query'
+import { useTitle } from 'react-use'
+import { match, not, __ } from 'ts-pattern'
 import { LocalBranchesUpToDateMap } from '../main/api'
-import { PullRequest, StatusState } from '../main/github'
+import { PullRequest } from '../main/github'
 import './App.global.css'
 import PullRequestBranchStatus from './PullRequestBranchStatus'
-import { useTitle } from 'react-use'
+import { CheckRunStateCircle, StatusContextStateCircle } from './StateCircle'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,28 +21,6 @@ const queryClient = new QueryClient({
     }
   }
 })
-
-function StatusCheckBox({ state }: { state: StatusState }) {
-  const color = ((): string => {
-    switch (state) {
-      case 'SUCCESS':
-        return 'bg-status-green'
-      case 'FAILURE':
-        return 'bg-status-red'
-      default:
-        return 'bg-status-yellow'
-    }
-  })()
-
-  return (
-    <div
-      className={classNames(
-        'w-[12px] h-[12px] rounded-full mr-1 last:mr-0',
-        color
-      )}
-    ></div>
-  )
-}
 
 function MonospaceOutput({ text }: { text: string }) {
   return (
@@ -81,14 +59,23 @@ function PullRequestListItem({
             {title} <span className="font-normal text-gray-600">#{number}</span>
           </div>
           <div className="flex my-2">
-            {commit.status !== null ? (
+            {commit.status !== null || commit.flattenedCheckRuns?.length ? (
               <div className="inline-flex items-center">
                 <span className="text-gray-600 font-semibold mr-2">
                   Checks:
                 </span>{' '}
-                {commit.status.contexts.map(({ state, context }) => (
-                  <StatusCheckBox key={context} state={state} />
-                ))}
+                {match(commit)
+                  .with({ status: not(__.nullish) }, (commit) =>
+                    commit.status.contexts.map((context) => (
+                      <StatusContextStateCircle key={context.id} {...context} />
+                    ))
+                  )
+                  .with({ flattenedCheckRuns: __ }, (commit) =>
+                    commit.flattenedCheckRuns.map((checkRun) => (
+                      <CheckRunStateCircle key={checkRun.id} {...checkRun} />
+                    ))
+                  )
+                  .otherwise(() => null)}
               </div>
             ) : null}
           </div>

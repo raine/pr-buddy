@@ -25,6 +25,62 @@ export const getUser = (gql: GraphQL) =>
 const StatusState = z.union([z.literal('FAILURE'), z.literal('SUCCESS')])
 export type StatusState = z.infer<typeof StatusState>
 
+const CheckStatusState = z.union([
+  z.literal('QUEUED'),
+  z.literal('IN_PROGRESS'),
+  z.literal('COMPLETED'),
+  z.literal('WAITING'),
+  z.literal('PENDING'),
+  z.literal('REQUESTED')
+])
+
+const CheckConclusionState = z.union([
+  z.literal('ACTION_REQUIRED'),
+  z.literal('TIMED_OUT'),
+  z.literal('CANCELLED'),
+  z.literal('FAILURE'),
+  z.literal('SUCCESS'),
+  z.literal('NEUTRAL'),
+  z.literal('SKIPPED'),
+  z.literal('STARTUP_FAILURE'),
+  z.literal('STALE'),
+  z.null()
+])
+
+const CheckRun = z.object({
+  id: z.string(),
+  checkSuite: z.object({
+    workflowRun: z
+      .object({
+        workflow: z.object({
+          name: z.string()
+        })
+      })
+      .nullable(),
+    app: z.object({
+      name: z.string()
+    })
+  }),
+  detailsUrl: z.string().url(),
+  name: z.string(),
+  summary: z.string().nullable(),
+  title: z.string().nullable(),
+  conclusion: CheckConclusionState,
+  status: CheckStatusState
+})
+
+export type CheckRun = z.infer<typeof CheckRun>
+
+const StatusContext = z.object({
+  id: z.string(),
+  state: StatusState,
+  targetUrl: z.string().url(),
+  description: z.string(),
+  context: z.string()
+})
+
+export type StatusContext = z.infer<typeof StatusContext>
+
 const LatestPullRequestsStatuses = z.array(
   z.object({
     title: z.string(),
@@ -46,17 +102,11 @@ const LatestPullRequestsStatuses = z.array(
       status: z.union([
         z.object({
           state: StatusState,
-          contexts: z.array(
-            z.object({
-              state: StatusState,
-              targetUrl: z.string().url(),
-              description: z.string(),
-              context: z.string()
-            })
-          )
+          contexts: z.array(StatusContext)
         }),
         z.null()
-      ])
+      ]),
+      flattenedCheckRuns: z.array(CheckRun)
     })
   })
 )
@@ -95,10 +145,46 @@ query($q: String!) {
                 status {
                   state
                   contexts {
+                    id
                     state
                     targetUrl
                     description
                     context
+                  }
+                },
+                checkSuites(last: 10) {
+                  nodes {
+                    status
+                    url
+                    conclusion
+                    workflowRun {
+                      runNumber
+                      workflow {
+                        name
+                      }
+                    }
+                    checkRuns(last: 10) {
+                      nodes {
+                        id
+                        checkSuite {
+                          workflowRun {
+                            workflow {
+                              name
+                            }
+                          }
+                          app{
+                            name
+                          }
+                        }
+                        detailsUrl
+                        name
+                        summary
+                        title
+                        url
+                        conclusion
+                        status
+                      }
+                    }
                   }
                 }
               }
@@ -112,10 +198,22 @@ query($q: String!) {
   `
   return gql(query, { q }).then((res: any) =>
     LatestPullRequestsStatuses.parse(
-      res.search.edges.map((pr: any) => ({
-        ..._.omit(pr.node, 'commits'),
-        commit: pr.node.commits.nodes[0]?.commit
-      }))
+      res.search.edges.map((pr: any) => {
+        const commit = pr.node.commits.nodes[0]?.commit
+        return {
+          // Only last commit of PR is interesting
+          ..._.omit(pr.node, 'commits'),
+          commit: {
+            ..._.omit(commit, 'checkSuites'),
+            // Checksuite is per app like travis or github actions. We don't
+            // really care about the app so all check runs in a single list works
+            // for now
+            flattenedCheckRuns: commit.checkSuites.nodes.flatMap(
+              (checkSuite: any) => checkSuite.checkRuns.nodes
+            )
+          }
+        }
+      })
     )
   )
 }
