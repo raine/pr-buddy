@@ -50,13 +50,6 @@ const CheckConclusionState = z.union([
 const CheckRun = z.object({
   id: z.string(),
   checkSuite: z.object({
-    workflowRun: z
-      .object({
-        workflow: z.object({
-          name: z.string()
-        })
-      })
-      .nullable(),
     app: z.object({
       name: z.string()
     })
@@ -157,21 +150,10 @@ query($q: String!) {
                     status
                     url
                     conclusion
-                    workflowRun {
-                      runNumber
-                      workflow {
-                        name
-                      }
-                    }
                     checkRuns(last: 10) {
                       nodes {
                         id
                         checkSuite {
-                          workflowRun {
-                            workflow {
-                              name
-                            }
-                          }
                           app{
                             name
                           }
