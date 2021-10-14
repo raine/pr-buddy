@@ -2,6 +2,7 @@ import * as path from 'path'
 import * as fs from 'fs/promises'
 import ini from 'ini'
 import { sh, ExecResult } from './sh'
+import { RebaseStatus } from './api'
 
 export async function readRepositoryGitConfig(repoPath: string) {
   const configPath = path.join(repoPath, '.git/config')
@@ -57,7 +58,18 @@ export const isBranchUpToDate = async (
 
 const trimmedStdout = (out: ExecResult): string => out.stdout.trim()
 
-export const rebase = async (git: GitCommand, base: string, branch: string) => {
+export const rebase = async (
+  emit: (status: RebaseStatus) => void,
+  git: GitCommand,
+  base: string,
+  branch: string
+): Promise<
+  | { result: 'OK' }
+  | {
+      result: 'FAILED_TO_REBASE'
+      message: string | undefined
+    }
+> => {
   let stashed = false
   if (await isDirtyWorkingTree(git)) {
     await git(`stash push -m "TEMP"`)
@@ -65,11 +77,21 @@ export const rebase = async (git: GitCommand, base: string, branch: string) => {
   }
   const currentBranch = trimmedStdout(await git(`rev-parse --abbrev-ref HEAD`))
   await git(`checkout origin/${branch}`)
-  const { code: rebaseExitCode } = await git(`rebase ${base}`)
-  if (rebaseExitCode > 0) await git(`rebase --abort`)
-  await git(`push --force origin HEAD:${branch}`)
-  await git(`checkout ${currentBranch}`)
-  if (stashed) await git(`stash pop`)
+  const { code: rebaseExitCode, stderr } = await git(`rebase ${base}`)
+  if (rebaseExitCode > 0) {
+    const couldNotApply = stderr.match(/.*\rerror: could not apply.*/)
+    await git(`rebase --abort`)
+    return {
+      result: 'FAILED_TO_REBASE' as const,
+      message: couldNotApply?.[0]
+    }
+  } else {
+    emit('GIT_PUSH')
+    // await git(`push --force origin HEAD:${branch}`)
+    await git(`checkout ${currentBranch}`)
+    if (stashed) await git(`stash pop`)
+    return { result: 'OK' as const }
+  }
 }
 
 export const fetchBranches = async (

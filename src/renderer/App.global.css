@@ -4,5 +4,11 @@
 
 html {
   font-size: 13px;
-  /* @apply bg-gray-100; */
+}
+
+*,
+a,
+button {
+  cursor: default;
+  user-select: none;
 }

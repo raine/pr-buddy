@@ -1,8 +1,8 @@
-import fs from 'fs'
-import {
+const fs = require('fs')
+const {
   appNodeModulesPath,
   srcNodeModulesPath
-} from '../configs/webpack.paths'
+} = require('../configs/webpack.paths')
 
 if (!fs.existsSync(srcNodeModulesPath) && fs.existsSync(appNodeModulesPath)) {
   fs.symlinkSync(appNodeModulesPath, srcNodeModulesPath, 'junction')

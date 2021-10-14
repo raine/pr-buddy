@@ -13,7 +13,8 @@ module.exports = {
         test: /\.[jt]sx?$/,
         exclude: /node_modules/,
         use: {
-          loader: 'ts-loader'
+          loader: 'ts-loader',
+          options: { transpileOnly: true }
         }
       }
     ]

@@ -1,8 +1,7 @@
-import path from 'path'
-import { execSync } from 'child_process'
-import fs from 'fs'
-import { dependencies } from '../../release/app/package.json'
-import webpackPaths from '../configs/webpack.paths'
+const { execSync } = require('child_process')
+const fs = require('fs')
+const webpackPaths = require('../configs/webpack.paths')
+const { dependencies } = require('../../release/app/package.json')
 
 if (
   Object.keys(dependencies || {}).length > 0 &&
