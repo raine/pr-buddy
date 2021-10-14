@@ -1,7 +1,8 @@
 import * as path from 'path'
+import * as cp from 'child_process'
 import * as fs from 'fs/promises'
 import ini from 'ini'
-import { sh, ExecResult } from './sh'
+import { exec, ExecResult, spawn } from './sh'
 import { RebaseStatus } from './api'
 
 export async function readRepositoryGitConfig(repoPath: string) {
@@ -39,10 +40,15 @@ export function parseRemoteUrl(url: string): RemoteUrlData {
   }
 }
 
-type GitCommand = (command: string) => Promise<ExecResult>
+type GitCommand = typeof exec & { spawn: typeof spawn }
 
-export const makeGit = (repositoryPath: string) => (command: string) =>
-  sh(`git -C ${repositoryPath} ${command}`)
+export const makeGit = (repositoryPath: string): GitCommand => {
+  const makeCmd = (command: string) => `git -C ${repositoryPath} ${command}`
+  const _exec: typeof exec = (command) => exec(makeCmd(command))
+  const _spawn: typeof spawn = (command, outputCallback) =>
+    spawn(makeCmd(command), outputCallback)
+  return Object.assign(_exec, { spawn: _spawn })
+}
 
 const isDirtyWorkingTree = (git: GitCommand) =>
   git(`diff --quiet`).then((res) => res.code > 0)
@@ -59,7 +65,7 @@ export const isBranchUpToDate = async (
 const trimmedStdout = (out: ExecResult): string => out.stdout.trim()
 
 export const rebase = async (
-  emit: (status: RebaseStatus) => void,
+  emit: (status: RebaseStatus, info?: string) => void,
   git: GitCommand,
   base: string,
   branch: string
@@ -77,7 +83,13 @@ export const rebase = async (
   }
   const currentBranch = trimmedStdout(await git(`rev-parse --abbrev-ref HEAD`))
   await git(`checkout origin/${branch}`)
-  const { code: rebaseExitCode, stderr } = await git(`rebase ${base}`)
+  const { code: rebaseExitCode, stderr } = await git.spawn(
+    `rebase ${base}`,
+    (outputLine) => {
+      const m = outputLine.match(/^Rebasing.*/)
+      if (m) emit('REBASE_PROGRESS', m[0].trim())
+    }
+  )
   if (rebaseExitCode > 0) {
     const couldNotApply = stderr.match(/.*\rerror: could not apply.*/)
     await git(`rebase --abort`)
@@ -88,7 +100,7 @@ export const rebase = async (
     }
   } else {
     emit('GIT_PUSH')
-    await git(`push --force origin HEAD:${branch}`)
+    // await git(`push --force origin HEAD:${branch}`)
     await git(`checkout ${currentBranch}`)
     if (stashed) await git(`stash pop`)
     return { result: 'OK' as const }
@@ -102,3 +114,21 @@ export const fetchBranches = async (
 ): Promise<void> => {
   await git(`fetch ${remote} ${branches.join(' ')}`)
 }
+
+async function main() {
+  const git = makeGit('/Users/raine/git/test-repo/clone1')
+  await git.spawn(`rebase master`, (outputLine: string) =>
+    console.log(outputLine.match(/^Rebasing.*/))
+  )
+  console.log('done')
+  // const git = cp.spawn(
+  //   'git -C /Users/raine/git/test-repo/clone1 rebase master',
+  //   { shell: true }
+  // )
+  // git.stderr.on('data', (data) => console.log('data', data.toString()))
+  // git.on('close', (code) => {
+  //   console.log(`child process exited with code ${code}`)
+  // })
+}
+
+// void main()

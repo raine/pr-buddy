@@ -1,5 +1,5 @@
 import React, { useReducer } from 'react'
-import { match, select } from 'ts-pattern'
+import { match, select, __ } from 'ts-pattern'
 import { MessageData } from '../main/api'
 import useMessages from '../main/hooks/useMessages'
 import Spinner from './Spinner'
@@ -60,15 +60,16 @@ export default function PullRequestBranchStatus(
   >((prevState, message) => {
     const def = () => 'DEFAULT' as const
     return match(message)
-      .with(
-        { type: 'REBASE', branch: headRefName, status: select() },
-        (status) =>
-          match(status)
-            .with('GIT_FETCH', () => <>Fetching the remote...</>)
-            .with('REBASE', () => <>Rebasing on {baseRefName}...</>)
-            .with('GIT_PUSH', () => <>Pushing, with force...</>)
-            .with('COMPLETE', def)
-            .otherwise(def)
+      .with({ type: 'REBASE', branch: headRefName }, (message) =>
+        match(message)
+          .with({ status: 'GIT_FETCH' }, () => <>Fetching the remote...</>)
+          .with({ status: 'REBASE' }, () => <>Rebasing on {baseRefName}...</>)
+          .with({ status: 'GIT_PUSH' }, () => <>Pushing, with force...</>)
+          .with({ status: 'REBASE_PROGRESS', info: __.string }, (message) => (
+            <>{message.info}</>
+          ))
+          .with({ status: 'COMPLETE' }, def)
+          .otherwise(def)
       )
       .with({ type: 'FETCH_PULL_REQUESTS', status: select() }, (status) =>
         match(status)

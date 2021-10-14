@@ -31,16 +31,31 @@ export type FetchPullRequests = {
   remoteRepoPath: string
 }
 
-export type RebaseStatus =
-  | 'GIT_PUSH'
-  | 'COMPLETE'
-  | 'GIT_FETCH'
-  | 'REBASE'
-  | 'FAILED_TO_REBASE'
+export type RebaseMessageData =
+  | {
+      type: 'REBASE'
+      branch: string
+      status:
+        | 'GIT_PUSH'
+        | 'COMPLETE'
+        | 'GIT_FETCH'
+        | 'REBASE'
+        | 'FAILED_TO_REBASE'
+    }
+  | {
+      type: 'REBASE'
+      branch: string
+      status: 'REBASE_PROGRESS'
+      info: string
+    }
 
-export type MessageData =
-  | { type: 'REBASE'; branch: string; status: RebaseStatus }
-  | { type: 'FETCH_PULL_REQUESTS'; status: 'START' | 'COMPLETE' }
+export type RebaseStatus = RebaseMessageData['status']
+
+export type FetchPullRequestsMessageData = {
+  type: 'FETCH_PULL_REQUESTS'
+  status: 'START' | 'COMPLETE'
+}
+export type MessageData = RebaseMessageData | FetchPullRequestsMessageData
 
 export type MessageListener = (data: MessageData) => void
 
@@ -94,8 +109,14 @@ export async function rebaseBranchOnLatestBase(
 ): Promise<
   { result: 'OK' } | { result: 'FAILED_TO_REBASE'; message: string | undefined }
 > {
-  const emit = (status: RebaseStatus) =>
-    emitMessage({ type: 'REBASE', branch: headRefName, status })
+  const emit = (status: RebaseStatus, info?: string): void => {
+    if (status === 'REBASE_PROGRESS') {
+      emitMessage({ type: 'REBASE', branch: headRefName, status, info: info! })
+    } else {
+      emitMessage({ type: 'REBASE', branch: headRefName, status })
+    }
+  }
+
   const { repositoryPath } = await settings.get()
   const git = makeGit(repositoryPath)
   emit('GIT_FETCH')
