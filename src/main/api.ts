@@ -18,6 +18,7 @@ import {
 } from './git'
 
 import pReduce from 'p-reduce'
+import delay from './delay'
 
 export type LocalBranchesUpToDateMap = {
   [headRefName: string]: boolean
@@ -110,16 +111,34 @@ export async function rebaseBranchOnLatestBase(
   headRefName: string,
   baseRefName: string
 ): Promise<
-  { result: 'OK' } | { result: 'FAILED_TO_REBASE'; message: string | undefined }
+  | { result: 'OK'; pullRequests: FetchPullRequests }
+  | { result: 'FAILED_TO_REBASE'; message: string | undefined }
 > {
   const { repositoryPath } = await settings.get()
   const git = makeGit(repositoryPath)
   emitMessage({ type: 'REBASE', branch: headRefName, status: 'GIT_FETCH' })
   await fetchBranches(git, 'origin', [baseRefName, headRefName])
   emitMessage({ type: 'REBASE', branch: headRefName, status: 'REBASE' })
-  return rebase(emitMessage, git, baseRefName, headRefName).finally(() => {
-    emitMessage({ type: 'REBASE', branch: headRefName, status: 'COMPLETE' })
-  })
+  return rebase(emitMessage, git, baseRefName, headRefName)
+    .then(async (res) => {
+      if (res.result === 'OK') {
+        // It ended up being slightly simpler to return new pr data in the
+        // rebase response and mutate query data in onSuccess of mutation
+        // - We need to wait a bit to refresh PRs so that checks data is updated
+        // - With this, we can keep the rebase button disabled as long as
+        //   mutation call is loading
+        emitMessage({ type: 'FETCH_PULL_REQUESTS', status: 'START' })
+        return {
+          ...res,
+          pullRequests: await delay(2000).then(fetchPullRequests)
+        }
+      } else {
+        return res
+      }
+    })
+    .finally(() => {
+      emitMessage({ type: 'REBASE', branch: headRefName, status: 'COMPLETE' })
+    })
 }
 
 ipcMain.handle('fetchPullRequests', (event, ...args) =>
