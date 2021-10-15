@@ -28,10 +28,10 @@ export default function PullRequestListItem({
   const rebaseMutation = useMutation(
     () => window.electronAPI.rebaseBranchOnLatestBase(headRefName, baseRefName),
     {
-      onSuccess: async ({ result }) => {
-        // Triggering pull requests to load again would clear the error message
-        if (result === 'OK')
-          await queryClient.invalidateQueries('pull-requests')
+      onSuccess: async (res) => {
+        if (res.result === 'OK') {
+          queryClient.setQueryData('pull-requests', res.pullRequests)
+        }
       }
     }
   )

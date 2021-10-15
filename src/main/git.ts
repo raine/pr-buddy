@@ -110,7 +110,7 @@ export const rebase = async (
     }
   } else {
     emitMessage({ type: 'REBASE', branch, status: 'GIT_PUSH' })
-    await git(`push --dry-run --force origin HEAD:${branch}`)
+    await git(`push --force origin HEAD:${branch}`)
     await git(`checkout ${currentBranch}`)
     if (stashed) await git(`stash pop`)
     return { result: 'OK' as const }
