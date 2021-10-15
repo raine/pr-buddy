@@ -5,8 +5,13 @@ import './App.global.css'
 import PullRequestListItem from './PullRequestListItem'
 
 export default function PullRequestList() {
-  const { isLoading, data } = useQuery('pull-requests', () =>
-    window.electronAPI.fetchPullRequests()
+  const { isLoading, data } = useQuery(
+    'pull-requests',
+    () => window.electronAPI.fetchPullRequests(),
+    {
+      refetchInterval: 60000,
+      refetchIntervalInBackground: true
+    }
   )
 
   useTitle(
