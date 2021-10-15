@@ -11,11 +11,14 @@ import 'core-js/stable'
 import 'regenerator-runtime/runtime'
 import path from 'path'
 import { app, BrowserWindow, shell } from 'electron'
-import { autoUpdater } from 'electron-updater'
 import log from 'electron-log'
 import buildMenu from './menu'
 import { resolveHtmlPath } from './util'
 import './api'
+
+log.catchErrors({
+  showDialog: true
+})
 
 export let mainWindow: BrowserWindow | null = null
 
@@ -89,11 +92,6 @@ const createWindow = async () => {
     event.preventDefault()
     void shell.openExternal(url)
   })
-
-  // Auto-update
-  log.transports.file.level = 'info'
-  autoUpdater.logger = log
-  void autoUpdater.checkForUpdatesAndNotify()
 }
 
 app.on('window-all-closed', () => {
