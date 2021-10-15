@@ -4,8 +4,8 @@
 __metadata:
   version: 4
 
-"electron-react-boilerplate@workspace:.":
+"pr-buddy@workspace:.":
   version: 0.0.0-use.local
-  resolution: "electron-react-boilerplate@workspace:."
+  resolution: "pr-buddy@workspace:."
   languageName: unknown
   linkType: soft
