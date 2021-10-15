@@ -122,6 +122,10 @@ export async function rebaseBranchOnLatestBase(
   })
 }
 
-;[fetchPullRequests, rebaseBranchOnLatestBase].forEach((fn) => {
-  ipcMain.handle(fn.name, (event, ...args) => (fn as any)(...args))
-})
+ipcMain.handle('fetchPullRequests', (event, ...args) =>
+  (fetchPullRequests as any)(...args)
+)
+
+ipcMain.handle('rebaseBranchOnLatestBase', (event, ...args) =>
+  (rebaseBranchOnLatestBase as any)(...args)
+)
