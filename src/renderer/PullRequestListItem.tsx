@@ -3,7 +3,6 @@ import { useMutation, useQueryClient } from 'react-query'
 import { match, not, __ } from 'ts-pattern'
 import { LocalBranchesUpToDateMap } from '../main/api'
 import { PullRequest } from '../main/github'
-import './App.global.css'
 import PullRequestBranchStatus from './PullRequestBranchStatus'
 import { CheckRunStateCircle, StatusContextStateCircle } from './StateCircle'
 

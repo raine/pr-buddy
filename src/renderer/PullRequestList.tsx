@@ -1,7 +1,6 @@
 import React from 'react'
 import { useQuery } from 'react-query'
 import { useTitle } from 'react-use'
-import './App.global.css'
 import PullRequestListItem from './PullRequestListItem'
 
 export default function PullRequestList() {

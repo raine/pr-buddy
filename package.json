@@ -111,6 +111,7 @@
     "postcss": "^8.3.9",
     "postcss-loader": "^6.1.1",
     "prettier": "^2.4.1",
+    "react-popper-tooltip": "^4.3.1",
     "react-query": "^3.26.0",
     "react-refresh": "^0.10.0",
     "react-refresh-typescript": "^2.0.2",
