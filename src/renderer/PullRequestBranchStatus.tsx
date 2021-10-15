@@ -1,7 +1,7 @@
 import React, { useReducer } from 'react'
 import { match, select } from 'ts-pattern'
 import { MessageData } from '../main/api'
-import useMessages from '../main/hooks/useMessages'
+import useMessages from './hooks/useMessages'
 import Spinner from './Spinner'
 
 type PullRequestBranchStatusProps = {
@@ -83,7 +83,7 @@ export default function PullRequestBranchStatus(
           .with('COMPLETE', def)
           .otherwise(def)
       )
-      .otherwise(def)
+      .otherwise(() => prevState)
   }, 'DEFAULT' as const)
 
   useMessages(dispatch)

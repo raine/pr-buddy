@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { MessageListener } from '../api'
+import { MessageListener } from '../../main/api'
 
 export default function useMessages(listener: MessageListener) {
   useEffect(() => {
