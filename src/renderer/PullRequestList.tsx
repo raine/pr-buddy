@@ -1,9 +1,12 @@
 import React from 'react'
-import { useQuery } from 'react-query'
+import { useQuery, useQueryClient } from 'react-query'
 import { useTitle } from 'react-use'
+import useMessages from './hooks/useMessages'
 import PullRequestListItem from './PullRequestListItem'
 
 export default function PullRequestList() {
+  const queryClient = useQueryClient()
+
   const { isLoading, data } = useQuery(
     'pull-requests',
     () => window.electronAPI.fetchPullRequests(),
@@ -12,6 +15,11 @@ export default function PullRequestList() {
       refetchIntervalInBackground: true
     }
   )
+
+  useMessages((message) => {
+    if (message.type === 'REFRESH_PULL_REQUESTS')
+      void queryClient.invalidateQueries('pull-requests')
+  })
 
   useTitle(
     'PR Buddy' +

@@ -1,4 +1,5 @@
 import { app, BrowserWindow, Menu, MenuItemConstructorOptions } from 'electron'
+import { emitMessage } from './api'
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
   selector?: string
@@ -89,42 +90,35 @@ function buildDarwinTemplate(
       }
     ]
   }
-  const subMenuViewDev: MenuItemConstructorOptions = {
+  const subMenuView: MenuItemConstructorOptions = {
     label: 'View',
     submenu: [
       {
-        label: 'Reload',
+        label: 'Refresh Pull Requests',
         accelerator: 'Command+R',
+        click: () => {
+          emitMessage({ type: 'REFRESH_PULL_REQUESTS' })
+        }
+      },
+      {
+        label: 'Reload',
+        accelerator: 'Shift+Command+R',
         click: () => {
           mainWindow.webContents.reload()
         }
       },
-      {
-        label: 'Toggle Full Screen',
-        accelerator: 'Ctrl+Command+F',
-        click: () => {
-          mainWindow.setFullScreen(!mainWindow.isFullScreen())
-        }
-      },
-      {
-        label: 'Toggle Developer Tools',
-        accelerator: 'Alt+Command+I',
-        click: () => {
-          mainWindow.webContents.toggleDevTools()
-        }
-      }
-    ]
-  }
-  const subMenuViewProd: MenuItemConstructorOptions = {
-    label: 'View',
-    submenu: [
-      {
-        label: 'Toggle Full Screen',
-        accelerator: 'Ctrl+Command+F',
-        click: () => {
-          mainWindow.setFullScreen(!mainWindow.isFullScreen())
-        }
-      }
+      ...(process.env.NODE_ENV === 'development' ||
+      process.env.DEBUG_PROD === 'true'
+        ? [
+            {
+              label: 'Toggle Developer Tools',
+              accelerator: 'Alt+Command+I',
+              click: () => {
+                mainWindow.webContents.toggleDevTools()
+              }
+            }
+          ]
+        : [])
     ]
   }
   const subMenuWindow: DarwinMenuItemConstructorOptions = {
@@ -140,11 +134,6 @@ function buildDarwinTemplate(
       { label: 'Bring All to Front', selector: 'arrangeInFront:' }
     ]
   }
-
-  const subMenuView =
-    process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
-      ? subMenuViewDev
-      : subMenuViewProd
 
   return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow]
 }

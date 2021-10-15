@@ -32,7 +32,7 @@ export type FetchPullRequests = {
   remoteRepoPath: string
 }
 
-export type RebaseMessageData =
+export type RebaseStatusMessageData =
   | {
       type: 'REBASE'
       branch: string
@@ -53,13 +53,19 @@ export type RebaseMessageData =
       }
     }
 
-export type RebaseStatus = RebaseMessageData['status']
+export type RebaseStatus = RebaseStatusMessageData['status']
 
-export type FetchPullRequestsMessageData = {
+export type FetchingPullRequestsMessageData = {
   type: 'FETCH_PULL_REQUESTS'
   status: 'START' | 'COMPLETE'
 }
-export type MessageData = RebaseMessageData | FetchPullRequestsMessageData
+
+export type RefreshPullRequestsMessageData = { type: 'REFRESH_PULL_REQUESTS' }
+
+export type MessageData =
+  | RebaseStatusMessageData
+  | FetchingPullRequestsMessageData
+  | RefreshPullRequestsMessageData
 
 export type MessageListener = (data: MessageData) => void
 
