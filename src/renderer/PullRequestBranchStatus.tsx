@@ -1,5 +1,5 @@
 import React, { useReducer } from 'react'
-import { match, select, __ } from 'ts-pattern'
+import { match, select } from 'ts-pattern'
 import { MessageData } from '../main/api'
 import useMessages from '../main/hooks/useMessages'
 import Spinner from './Spinner'
@@ -15,7 +15,7 @@ const RemoteBranchUpToDate = ({
   baseRefName
 }: Pick<PullRequestBranchStatusProps, 'baseRefName'>) => (
   <span>
-    Remote branch is <span className="text-green-700">up-to-date</span> with{' '}
+    Branch is <span className="text-green-700">up-to-date</span> with{' '}
     {baseRefName}
   </span>
 )
@@ -24,7 +24,7 @@ const RemoteBranchOutOfDate = ({
   baseRefName
 }: Pick<PullRequestBranchStatusProps, 'baseRefName'>) => (
   <span>
-    Remote branch is <span className="text-red-800">out-of-date</span> with{' '}
+    Branch is <span className="text-red-800">out-of-date</span> with{' '}
     {baseRefName}
   </span>
 )
@@ -50,7 +50,7 @@ export default function PullRequestBranchStatus(
     .with({ isUpToDateWithBase: false }, () => (
       <RemoteBranchOutOfDate baseRefName={baseRefName} />
     ))
-    .run()
+    .otherwise(() => null)
 
   const [branchStatus, dispatch] = useReducer<
     (
