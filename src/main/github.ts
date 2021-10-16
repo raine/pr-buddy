@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { graphql } from '@octokit/graphql'
 import { RequestParameters } from '@octokit/graphql/dist-types/types'
-import _ from 'lodash'
+import { omit } from 'lodash'
 
 type GraphQL = (query: string, params?: RequestParameters) => Promise<unknown>
 
@@ -184,9 +184,9 @@ query($q: String!) {
         const commit = pr.node.commits.nodes[0]?.commit
         return {
           // Only last commit of PR is interesting
-          ..._.omit(pr.node, 'commits'),
+          ...omit(pr.node, 'commits'),
           commit: {
-            ..._.omit(commit, 'checkSuites'),
+            ...omit(commit, 'checkSuites'),
             // Checksuite is per app like travis or github actions. We don't
             // really care about the app so all check runs in a single list works
             // for now
