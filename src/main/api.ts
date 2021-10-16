@@ -18,7 +18,6 @@ import {
 } from './git'
 
 import pReduce from 'p-reduce'
-import delay from './delay'
 
 export type LocalBranchesUpToDateMap = {
   [headRefName: string]: boolean
@@ -134,10 +133,7 @@ export async function rebaseBranchOnLatestBase(
         // - With this, we can keep the rebase button disabled as long as
         //   mutation call is loading
         emitMessage({ type: 'FETCH_PULL_REQUESTS', status: 'START' })
-        return {
-          ...res,
-          pullRequests: await delay(2000).then(fetchPullRequests)
-        }
+        return { ...res, pullRequests: await fetchPullRequests() }
       } else {
         return res
       }
