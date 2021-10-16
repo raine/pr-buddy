@@ -1,6 +1,6 @@
 {
   "name": "pr-buddy",
-  "productName": "PrBuddy",
+  "productName": "PR Buddy",
   "scripts": {
     "build": "concurrently 'yarn build:main' 'yarn build:renderer'",
     "build:main": "NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./erb/configs/webpack.config.main.prod.js",
@@ -16,8 +16,8 @@
     "format": "prettier --write ."
   },
   "build": {
-    "productName": "PrBuddy",
-    "appId": "dev.raine.PrBuddy",
+    "productName": "PR Buddy",
+    "appId": "dev.raine.prbuddy",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
