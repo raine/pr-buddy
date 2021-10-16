@@ -9,19 +9,26 @@ export type ExecResult = {
   stderr: string
 }
 
-export const exec = (command: string): Promise<ExecResult> =>
+export const exec = (
+  command: string,
+  env?: NodeJS.ProcessEnv
+): Promise<ExecResult> =>
   new Promise((resolve) => {
     debug('exec:', command)
-    cp.exec(command, (err, stdout, stderr) => {
-      const code = err ? { code: 1 } : { code: 0 }
-      debug({ stdout, stderr, ...code })
-      resolve({
-        stdout,
-        stderr,
-        ...err,
-        ...code
-      })
-    })
+    cp.exec(
+      command,
+      { env: { ...process.env, ...env }, encoding: 'utf8' },
+      (err, stdout, stderr) => {
+        const code = err ? { code: 1 } : { code: 0 }
+        debug({ stdout, stderr, ...code })
+        resolve({
+          stdout,
+          stderr,
+          ...err,
+          ...code
+        })
+      }
+    )
   })
 
 export type SpawnResult = {
@@ -32,13 +39,17 @@ export type SpawnResult = {
 
 export const spawn = (
   command: string,
-  outputCallback: (outputLine: string) => void
+  outputCallback: (outputLine: string) => void,
+  env?: NodeJS.ProcessEnv
 ): Promise<SpawnResult> => {
   return new Promise((resolve, reject) => {
     let stderr = ''
     let stdout = ''
     debug('spawn:', command)
-    const p = cp.spawn(command, { shell: true })
+    const p = cp.spawn(command, {
+      shell: true,
+      env: { ...process.env, ...env }
+    })
     p.stderr.on('data', (data) => {
       const str = data.toString()
       stderr += str

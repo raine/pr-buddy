@@ -1,9 +1,8 @@
-import * as path from 'path'
-import * as cp from 'child_process'
 import * as fs from 'fs/promises'
 import ini from 'ini'
+import * as path from 'path'
+import { MessageData } from './api'
 import { exec, ExecResult, spawn } from './sh'
-import { MessageData, RebaseStatus } from './api'
 
 export async function readRepositoryGitConfig(repoPath: string) {
   const configPath = path.join(repoPath, '.git/config')
@@ -43,10 +42,11 @@ export function parseRemoteUrl(url: string): RemoteUrlData {
 type GitCommand = typeof exec & { spawn: typeof spawn }
 
 export const makeGit = (repositoryPath: string): GitCommand => {
-  const makeCmd = (command: string) => `git -C ${repositoryPath} ${command}`
-  const _exec: typeof exec = (command) => exec(makeCmd(command))
+  const env = { GIT_SSH_COMMAND: 'ssh -o BatchMode=yes' }
+  const makeCmd = (command: string) => `git  -C ${repositoryPath} ${command}`
+  const _exec: typeof exec = (command) => exec(makeCmd(command), env)
   const _spawn: typeof spawn = (command, outputCallback) =>
-    spawn(makeCmd(command), outputCallback)
+    spawn(makeCmd(command), outputCallback, env)
   return Object.assign(_exec, { spawn: _spawn })
 }
 
