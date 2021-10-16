@@ -15,9 +15,9 @@ import log from 'electron-log'
 import buildMenu from './menu'
 import { resolveHtmlPath } from './util'
 import { debounce } from 'lodash'
+import type WindowStateKeeper from 'electron-window-state'
 
 import './api'
-import windowStateKeeper from 'electron-window-state'
 
 log.catchErrors({
   showDialog: true
@@ -60,6 +60,9 @@ const createWindow = async () => {
   const getAssetPath = (...paths: string[]): string =>
     path.join(RESOURCES_PATH, ...paths)
 
+  const windowStateKeeper: (
+    opts: WindowStateKeeper.Options
+  ) => WindowStateKeeper.State = require('electron-window-state')
   const mainWindowState = windowStateKeeper({
     defaultWidth: 600,
     defaultHeight: 400
