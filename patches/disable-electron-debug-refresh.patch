@@ -1,0 +1,13 @@
+This is overriding Cmd-R behavior set up in menu.ts so has to be disabled and
+library itself provides no configuration for this.
+--- node_modules/electron-debug/index.js	2021-10-16 16:54:54.000000000 +0300
++++ node_modules/electron-debug/index.js	2021-10-16 16:58:18.000000000 +0300
+@@ -113,7 +113,7 @@
+ 		localShortcut.register(isMacOS ? 'Command+Alt+I' : 'Control+Shift+I', devTools);
+ 		localShortcut.register('F12', devTools);
+ 
+-		localShortcut.register('CommandOrControl+R', refresh);
++    // localShortcut.register('CommandOrControl+R', refresh);
+ 		localShortcut.register('F5', refresh);
+ 	})();
+ };
