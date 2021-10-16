@@ -141,6 +141,7 @@
     "electron-log": "^4.4.1",
     "electron-settings": "^4.0.2",
     "electron-updater": "^4.3.9",
+    "electron-window-state": "^5.0.3",
     "history": "4.x.x",
     "ini": "^2.0.0",
     "lodash": "^4.17.21",

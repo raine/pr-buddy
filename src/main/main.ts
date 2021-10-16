@@ -14,7 +14,10 @@ import { app, BrowserWindow, shell } from 'electron'
 import log from 'electron-log'
 import buildMenu from './menu'
 import { resolveHtmlPath } from './util'
+import { debounce } from 'lodash'
+
 import './api'
+import windowStateKeeper from 'electron-window-state'
 
 log.catchErrors({
   showDialog: true
@@ -57,15 +60,30 @@ const createWindow = async () => {
   const getAssetPath = (...paths: string[]): string =>
     path.join(RESOURCES_PATH, ...paths)
 
+  const mainWindowState = windowStateKeeper({
+    defaultWidth: 600,
+    defaultHeight: 400
+  })
+
   mainWindow = new BrowserWindow({
     show: true,
-    width: 512,
-    height: 364,
+    x: mainWindowState.x,
+    y: mainWindowState.y,
+    width: mainWindowState.width,
+    height: mainWindowState.height,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
     }
   })
+
+  const debouncedSaveWindowState = debounce(
+    (event: any) => mainWindowState.saveState(event.sender),
+    500
+  )
+
+  mainWindow.on('resize', debouncedSaveWindowState)
+  mainWindow.on('move', debouncedSaveWindowState)
 
   void mainWindow.loadURL(resolveHtmlPath('index.html'))
 
