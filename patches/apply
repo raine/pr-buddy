@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+root=$(git rev-parse --show-toplevel)
+patches_path="$root/patches"
+cd "$root"
+find "$patches_path" -iname '*.patch' \
+  -exec patch  --quiet --forward -p0 -i {} \;

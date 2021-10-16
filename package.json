@@ -8,7 +8,7 @@
     "rebuild": "electron-rebuild --parallel --types prod,dev,optional --module-dir src",
     "lint": "NODE_ENV=development eslint . --cache --ext .js,.jsx,.ts,.tsx",
     "package": "rm -rf release/app/dist && yarn build && electron-builder build --publish never",
-    "postinstall": "node erb/scripts/check-native-dep.js && electron-builder install-app-deps && NODE_ENV=development webpack --config ./erb/configs/webpack.config.renderer.dev.dll.js",
+    "postinstall": "node erb/scripts/check-native-dep.js && electron-builder install-app-deps && NODE_ENV=development webpack --config ./erb/configs/webpack.config.renderer.dev.dll.js && ./patches/apply",
     "dev": "node ./erb/scripts/check-port-in-use.js && yarn dev:renderer",
     "dev:main": "NODE_ENV=development electron -r ts-node/register/transpile-only ./src/main/main.ts",
     "dev:renderer": "NODE_ENV=development webpack serve --config ./erb/configs/webpack.config.renderer.dev.js",
