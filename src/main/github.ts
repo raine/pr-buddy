@@ -1,9 +1,11 @@
 import { z } from 'zod'
-import { graphql } from '@octokit/graphql'
-import { RequestParameters } from '@octokit/graphql/dist-types/types'
+import {
+  RequestParameters,
+  graphql as GraphQL
+} from '@octokit/graphql/dist-types/types'
 import { omit } from 'lodash'
 
-type GraphQL = (query: string, params?: RequestParameters) => Promise<unknown>
+type GQL = (query: string, params?: RequestParameters) => Promise<unknown>
 
 const GithubUser = z.object({
   login: z.string(),
@@ -11,7 +13,7 @@ const GithubUser = z.object({
 })
 export type GithubUser = z.infer<typeof GithubUser>
 
-export const getUser = (gql: GraphQL) =>
+export const getUser = (gql: GQL) =>
   gql(
     `
 {
@@ -110,7 +112,7 @@ export type LatestPullRequestsStatuses = z.infer<
 export type PullRequest = LatestPullRequestsStatuses[0]
 
 export const getLatestPrsStatuses = async (
-  gql: GraphQL,
+  gql: GQL,
   repo: string,
   author: string
 ) => {
@@ -206,14 +208,17 @@ type GraphQLClientOptions = {
 }
 
 export const makeGqlClient =
-  (opts: GraphQLClientOptions) => (query: string, params?: RequestParameters) =>
-    graphql(query, {
+  (opts: GraphQLClientOptions) =>
+  (query: string, params?: RequestParameters) => {
+    const graphql = require('@octokit/graphql').graphql as GraphQL
+    return graphql(query, {
       ...params,
       baseUrl: opts.githubApiBaseUrl,
       headers: {
         authorization: `token ${opts.githubApiToken}`
       }
     })
+  }
 
 // The api base url should probably be configurable because you can't
 // reliably determine the base url like this
