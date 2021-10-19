@@ -44,17 +44,17 @@ function buildDarwinTemplate(
   mainWindow: BrowserWindow
 ): MenuItemConstructorOptions[] {
   const subMenuAbout: DarwinMenuItemConstructorOptions = {
-    label: 'Electron',
+    label: 'PR Buddy',
     submenu: [
       {
-        label: 'About ElectronReact',
+        label: 'About PR Buddy',
         selector: 'orderFrontStandardAboutPanel:'
       },
       { type: 'separator' },
       { label: 'Services', submenu: [] },
       { type: 'separator' },
       {
-        label: 'Hide ElectronReact',
+        label: 'Hide PR Buddy',
         accelerator: 'Command+H',
         selector: 'hide:'
       },

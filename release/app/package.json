@@ -1,6 +1,6 @@
 {
   "name": "pr-buddy",
-  "productName": "PrBuddy",
+  "productName": "PR Buddy",
   "version": "1.0.0",
   "main": "./dist/main/main.js",
   "scripts": {
