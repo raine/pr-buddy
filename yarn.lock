@@ -3295,16 +3295,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron-window-state@npm:^5.0.3":
-  version: 5.0.3
-  resolution: "electron-window-state@npm:5.0.3"
-  dependencies:
-    jsonfile: ^4.0.0
-    mkdirp: ^0.5.1
-  checksum: 955868c1db598cfb5111612c9df93f61b8999b339fb56cb37ba884a9141478feaef9e9b4d9e777079cdad80fb0bb64b61ae706c85f1f91ba5904f8596d30d7e9
-  languageName: node
-  linkType: hard
-
 "electron@npm:^15.1.2":
   version: 15.1.2
   resolution: "electron@npm:15.1.2"
@@ -7180,7 +7170,6 @@ fsevents@~2.3.2:
     electron-notarize: ^1.1.1
     electron-rebuild: ^3.2.3
     electron-settings: ^4.0.2
-    electron-window-state: ^5.0.3
     eslint: ^7.32.0
     eslint-config-prettier: ^8.3.0
     eslint-plugin-prettier: ^4.0.0
