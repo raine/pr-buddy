@@ -1,9 +1,27 @@
-import { app, BrowserWindow, Menu, MenuItemConstructorOptions } from 'electron'
+import {
+  app,
+  BrowserWindow,
+  dialog,
+  Menu,
+  MenuItemConstructorOptions
+} from 'electron'
 import { emitMessageToWindow } from './api'
+import { createWindow } from './main'
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
   selector?: string
   submenu?: DarwinMenuItemConstructorOptions[] | Menu
+}
+
+export async function openRepositoryFromMenu() {
+  const result = await dialog.showOpenDialog({
+    properties: ['openDirectory']
+  })
+
+  if (!result.canceled) {
+    const repositoryPath = result.filePaths[0]
+    void createWindow({ repositoryPath })
+  }
 }
 
 function setupDevelopmentEnvironment(mainWindow: BrowserWindow): void {
@@ -74,6 +92,18 @@ function buildDarwinTemplate(
       }
     ]
   }
+  const subMenuFile: DarwinMenuItemConstructorOptions = {
+    label: 'File',
+    submenu: [
+      {
+        label: 'Open Repository...',
+        accelerator: 'Command+O',
+        click: () => {
+          void openRepositoryFromMenu()
+        }
+      }
+    ]
+  }
   const subMenuEdit: DarwinMenuItemConstructorOptions = {
     label: 'Edit',
     submenu: [
@@ -137,7 +167,7 @@ function buildDarwinTemplate(
     ]
   }
 
-  return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow]
+  return [subMenuAbout, subMenuFile, subMenuEdit, subMenuView, subMenuWindow]
 }
 
 function buildDefaultTemplate(mainWindow: BrowserWindow) {

@@ -40,7 +40,7 @@ const installExtensions = async () => {
     .catch(console.log)
 }
 
-const createWindow = async () => {
+export const createWindow = async (initData: InitData) => {
   if (isDevelopment) await installExtensions()
 
   const windowStateKeeper: (
@@ -62,11 +62,6 @@ const createWindow = async () => {
       preload: path.join(__dirname, 'preload.js')
     }
   })
-
-  const { lastRepositoryPath } = await settings.get()
-  const initData: InitData = {
-    repositoryPath: lastRepositoryPath
-  }
 
   const debouncedSaveWindowState = debounce(
     (event: any) => mainWindowState.saveState(event.sender),
@@ -111,12 +106,16 @@ app.on('window-all-closed', () => {
 
 app
   .whenReady()
-  .then(() => {
-    void createWindow()
+  .then(async () => {
+    const { lastRepositoryPath } = await settings.get()
+    void createWindow({ repositoryPath: lastRepositoryPath })
 
-    app.on('activate', () => {
+    app.on('activate', async () => {
       const windows = BrowserWindow.getAllWindows().filter((b) => b.isVisible())
-      if (!windows.length) void createWindow()
+      if (!windows.length) {
+        const { lastRepositoryPath } = await settings.get()
+        void createWindow({ repositoryPath: lastRepositoryPath })
+      }
     })
   })
   .catch(console.log)
