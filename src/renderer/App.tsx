@@ -1,6 +1,6 @@
 import './App.global.css'
 import { match, select } from 'ts-pattern'
-import React, { useReducer } from 'react'
+import React, { useEffect, useReducer } from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import PullRequestList from './PullRequestList'
 import { MessageData } from '../main/api'
@@ -14,8 +14,11 @@ const queryClient = new QueryClient({
   }
 })
 
+// //@ts-ignore
+// window.foo = 'bar'
+
 type AppProps = { repositoryPath?: string }
-type AppState = AppProps
+export type AppState = AppProps
 export default function App(props: AppProps) {
   const [appState, dispatch] = useReducer<
     (prevState: AppState, message: MessageData) => AppState
@@ -29,6 +32,11 @@ export default function App(props: AppProps) {
         .otherwise(() => prevState),
     props
   )
+
+  useEffect(() => {
+    //@ts-ignore
+    window.appState = appState
+  }, [appState])
 
   useMessages(dispatch)
   const { repositoryPath } = appState
