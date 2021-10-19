@@ -1,4 +1,3 @@
-import * as settings from './settings'
 import { dialog, ipcMain, BrowserWindow } from 'electron'
 import pReduce from 'p-reduce'
 import {
@@ -169,7 +168,6 @@ export async function showOpenRepositoryDialog(this: BrowserWindow) {
   if (!result.canceled) {
     // TODO: Handle is not git repo?
     const repositoryPath = result.filePaths[0]
-    await settings.set({ lastRepositoryPath: repositoryPath })
     emit({ type: 'SET_REPOSITORY_PATH', value: repositoryPath })
   }
 }
