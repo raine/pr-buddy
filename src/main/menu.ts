@@ -1,5 +1,5 @@
 import { app, BrowserWindow, Menu, MenuItemConstructorOptions } from 'electron'
-import { emitMessage } from './api'
+import { emitMessageToWindow } from './api'
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
   selector?: string
@@ -96,8 +96,10 @@ function buildDarwinTemplate(
       {
         label: 'Refresh Pull Requests',
         accelerator: 'Command+R',
-        click: () => {
-          emitMessage({ type: 'REFRESH_PULL_REQUESTS' })
+        click: (menuItem, window) => {
+          if (window) {
+            emitMessageToWindow(window)({ type: 'REFRESH_PULL_REQUESTS' })
+          }
         }
       },
       {

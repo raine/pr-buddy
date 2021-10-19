@@ -10,31 +10,39 @@ export async function readRepositoryGitConfig(repoPath: string) {
 }
 
 type RemoteUrlData = {
-  repoHost: string
+  repositoryHost: string
   remoteRepoPath: string
 }
 
-type RemoteData = RemoteUrlData & { name: string }
+type RepoConfig = RemoteUrlData & {
+  remoteName: string
+  githubApiToken?: string
+}
 
-export async function getRepositoryRemoteData(
+export async function getRepositoryConfig(
   repoPath: string
-): Promise<RemoteData> {
+): Promise<RepoConfig> {
   const config = await readRepositoryGitConfig(repoPath)
   const remoteUrl = config['remote "origin"']?.url
+  const githubApiToken = config['pr-buddy']['github-api-token']
   if (!remoteUrl) throw new Error('Could not parse repository origin url')
-  return { ...parseRemoteUrl(remoteUrl), name: 'origin' }
+  return {
+    ...parseRemoteUrl(remoteUrl),
+    githubApiToken,
+    remoteName: 'origin'
+  }
 }
 
 export function parseRemoteUrl(url: string): RemoteUrlData {
   const sshGitUrlMatch = url.match(/git@(.+?):(.+?).git/)
   if (sshGitUrlMatch) {
-    const [repoHost, remoteRepoPath] = sshGitUrlMatch.slice(1)
-    return { repoHost, remoteRepoPath }
+    const [repositoryHost, remoteRepoPath] = sshGitUrlMatch.slice(1)
+    return { repositoryHost, remoteRepoPath }
   }
 
   const parsedUrl = new URL(url)
   return {
-    repoHost: parsedUrl.host,
+    repositoryHost: parsedUrl.host,
     remoteRepoPath: parsedUrl.pathname.replace(/^\//, '').replace(/\.git$/, '')
   }
 }
@@ -43,7 +51,7 @@ type GitCommand = typeof exec & { spawn: typeof spawn }
 
 export const makeGit = (repositoryPath: string): GitCommand => {
   const env = { GIT_SSH_COMMAND: 'ssh -o BatchMode=yes' }
-  const makeCmd = (command: string) => `git  -C ${repositoryPath} ${command}`
+  const makeCmd = (command: string) => `git -C ${repositoryPath} ${command}`
   const _exec: typeof exec = (command) => exec(makeCmd(command), env)
   const _spawn: typeof spawn = (command, outputCallback) =>
     spawn(makeCmd(command), outputCallback, env)
@@ -84,7 +92,7 @@ export const rebase = async (
   const currentBranch = trimmedStdout(await git(`rev-parse --abbrev-ref HEAD`))
   await git(`checkout origin/${branch}`)
   const { code: rebaseExitCode, stderr } = await git.spawn(
-    `rebase ${base}`,
+    `rebase origin/${base}`,
     (outputLine) => {
       const m = outputLine.match(/^Rebasing \((\d+)\/(\d+)\)/)
       if (m) {

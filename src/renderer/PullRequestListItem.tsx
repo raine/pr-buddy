@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from 'react-query'
 import { match, not, __ } from 'ts-pattern'
 import { LocalBranchesUpToDateMap } from '../main/api'
 import { PullRequest } from '../main/github'
+import useMessages from './hooks/useMessages'
 import PullRequestBranchStatus from './PullRequestBranchStatus'
 import { CheckRunStateCircle, StatusContextStateCircle } from './StateCircle'
 
@@ -21,12 +22,21 @@ export default function PullRequestListItem({
   headRefName,
   baseRefName,
   localBranchesUpToDateMap,
-  url
-}: PullRequest & { localBranchesUpToDateMap: LocalBranchesUpToDateMap }) {
+  url,
+  repositoryPath
+}: PullRequest & {
+  localBranchesUpToDateMap: LocalBranchesUpToDateMap
+  repositoryPath: string
+}) {
   const queryClient = useQueryClient()
   const isUpToDateWithBase = localBranchesUpToDateMap[headRefName]
   const rebaseMutation = useMutation(
-    () => window.electronAPI.rebaseBranchOnLatestBase(headRefName, baseRefName),
+    () =>
+      window.electronAPI.rebaseBranchOnLatestBase(
+        repositoryPath,
+        headRefName,
+        baseRefName
+      ),
     {
       onSuccess: async (res) => {
         if (res.result === 'OK') {
@@ -36,8 +46,12 @@ export default function PullRequestListItem({
     }
   )
 
+  useMessages((message) => {
+    if (message.type === 'REFRESH_PULL_REQUESTS') rebaseMutation.reset()
+  })
+
   return (
-    <div className="mb-4 border-gray-100 border rounded-md p-3">
+    <div className="mb-4 border-gray-150 border rounded-md p-3">
       <div className="flex">
         <div className="flex-grow">
           <div className="text-md leading-snug text-gray-800 font-medium">
