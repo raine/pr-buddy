@@ -3,10 +3,16 @@ import { z } from 'zod'
 
 const Settings = z
   .object({
-    repositoryPath: z.string()
+    lastRepositoryPath: z.string()
   })
   .partial()
 
-export async function get() {
+export type Settings = z.infer<typeof Settings>
+
+export async function get(): Promise<Settings> {
   return settings.get().then((obj) => Settings.parse(obj))
+}
+
+export async function set(obj: Settings): Promise<void> {
+  return settings.set(obj)
 }

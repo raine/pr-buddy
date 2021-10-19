@@ -17,8 +17,6 @@ log.catchErrors({
   showDialog: true
 })
 
-export let mainWindow: BrowserWindow | null = null
-
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support')
   sourceMapSupport.install()
@@ -53,7 +51,7 @@ const createWindow = async () => {
     defaultHeight: 400
   })
 
-  mainWindow = new BrowserWindow({
+  const mainWindow = new BrowserWindow({
     show: true,
     x: mainWindowState.x,
     y: mainWindowState.y,
@@ -65,7 +63,10 @@ const createWindow = async () => {
     }
   })
 
-  const initData: InitData = await settings.get()
+  const { lastRepositoryPath } = await settings.get()
+  const initData: InitData = {
+    repositoryPath: lastRepositoryPath
+  }
 
   const debouncedSaveWindowState = debounce(
     (event: any) => mainWindowState.saveState(event.sender),
@@ -91,10 +92,6 @@ const createWindow = async () => {
     }
   })
 
-  mainWindow.on('closed', () => {
-    mainWindow = null
-  })
-
   buildMenu(mainWindow)
 
   // Open urls in the user's browser
@@ -116,10 +113,10 @@ app
   .whenReady()
   .then(() => {
     void createWindow()
+
     app.on('activate', () => {
-      // On macOS it's common to re-create a window in the app when the
-      // dock icon is clicked and there are no other windows open.
-      if (mainWindow === null) void createWindow()
+      const windows = BrowserWindow.getAllWindows().filter((b) => b.isVisible())
+      if (!windows.length) void createWindow()
     })
   })
   .catch(console.log)
