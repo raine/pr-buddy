@@ -10,7 +10,7 @@ function Checkmark({ className }: { className?: string }) {
       viewBox="22.25 112.5 802.25 622"
       xmlns="http://www.w3.org/2000/svg"
       className={classNames(
-        'h-[14px] w-[14px] inline-block fill-current text-emerald-500',
+        'h-[12px] w-[12px] inline-block fill-current text-emerald-500',
         className
       )}
     >
@@ -27,7 +27,7 @@ function Cross({ className }: { className?: string }) {
       viewBox="36.626 36.626 772.883 772.883"
       xmlns="http://www.w3.org/2000/svg"
       className={classNames(
-        'h-[12px] w-[12px] inline-block fill-current text-red-500',
+        'h-[10px] w-[10px] inline-block fill-current text-red-500',
         className
       )}
     >
@@ -76,7 +76,7 @@ const Tooltip = ({
   setTooltipRef,
   ...tooltipProps
 }: TooltipProps) => {
-  const className = 'mr-[4px]'
+  const className = 'mr-2'
   const symbol = match(state)
     .with('SUCCESS', () => <Checkmark className={className} />)
     .with('FAILURE', () => <Cross className={className} />)
@@ -91,21 +91,30 @@ const Tooltip = ({
       className="bg-white rounded px-2 py-1 drop-shadow-sm text-gray-700 border border-gray-200 flex items-center"
     >
       {symbol}
-      <span className="font-medium">{name}</span>
+      <span>{name}</span>
     </div>
   )
 }
 
 export function StateCircle({ state, detailsUrl, buildName }: any) {
   const { getTooltipProps, setTooltipRef, setTriggerRef, visible } =
-    usePopperTooltip()
+    usePopperTooltip(undefined, {
+      modifiers: [
+        { name: 'offset', options: { offset: [0, 6] } },
+        { name: 'preventOverflow', options: { padding: 10 } }
+      ]
+    })
 
   return (
     <div className="mr-1 last:mr-0">
       <div ref={setTriggerRef} className="flex">
-        <a href={detailsUrl} target="_blank">
+        {detailsUrl ? (
+          <a href={detailsUrl} target="_blank">
+            <StateCircleIcon state={state} />
+          </a>
+        ) : (
           <StateCircleIcon state={state} />
-        </a>
+        )}
       </div>
       {visible && (
         <Tooltip

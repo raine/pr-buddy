@@ -4,12 +4,18 @@ import { useTitle } from 'react-use'
 import useMessages from './hooks/useMessages'
 import PullRequestListItem from './PullRequestListItem'
 
-export default function PullRequestList() {
+type PullRequestListProps = {
+  repositoryPath: string
+}
+
+export default function PullRequestList({
+  repositoryPath
+}: PullRequestListProps) {
   const queryClient = useQueryClient()
 
   const { isLoading, data } = useQuery(
     'pull-requests',
-    () => window.electronAPI.fetchPullRequests(),
+    () => window.electronAPI.fetchPullRequests(repositoryPath),
     {
       refetchInterval: 60000,
       refetchIntervalInBackground: true
@@ -34,6 +40,7 @@ export default function PullRequestList() {
         {data?.pullRequests.map((pr) => (
           <PullRequestListItem
             key={pr.url}
+            repositoryPath={repositoryPath}
             localBranchesUpToDateMap={data.localBranchesUpToDateMap}
             {...pr}
           />

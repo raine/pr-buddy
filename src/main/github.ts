@@ -4,6 +4,7 @@ import {
   graphql as GraphQL
 } from '@octokit/graphql/dist-types/types'
 import { omit } from 'lodash'
+import { inspect } from 'util'
 
 type GQL = (query: string, params?: RequestParameters) => Promise<unknown>
 
@@ -24,7 +25,11 @@ export const getUser = (gql: GQL) =>
 }`
   ).then((res: any) => GithubUser.parse(res.viewer))
 
-const StatusState = z.union([z.literal('FAILURE'), z.literal('SUCCESS')])
+const StatusState = z.union([
+  z.literal('FAILURE'),
+  z.literal('SUCCESS'),
+  z.literal('PENDING')
+])
 export type StatusState = z.infer<typeof StatusState>
 
 const CheckStatusState = z.union([
@@ -69,7 +74,7 @@ export type CheckRun = z.infer<typeof CheckRun>
 const StatusContext = z.object({
   id: z.string(),
   state: StatusState,
-  targetUrl: z.string().url(),
+  targetUrl: z.string().url().nullable(),
   description: z.string(),
   context: z.string()
 })
@@ -180,26 +185,35 @@ query($q: String!) {
   }
 }
   `
-  return gql(query, { q }).then((res: any) =>
-    LatestPullRequestsStatuses.parse(
-      res.search.edges.map((pr: any) => {
-        const commit = pr.node.commits.nodes[0]?.commit
-        return {
-          // Only last commit of PR is interesting
-          ...omit(pr.node, 'commits'),
-          commit: {
-            ...omit(commit, 'checkSuites'),
-            // Checksuite is per app like travis or github actions. We don't
-            // really care about the app so all check runs in a single list works
-            // for now
-            flattenedCheckRuns: commit.checkSuites.nodes.flatMap(
-              (checkSuite: any) => checkSuite.checkRuns.nodes
-            )
+  return gql(query, { q }).then((res: any) => {
+    try {
+      return LatestPullRequestsStatuses.parse(
+        res.search.edges.map((pr: any) => {
+          const commit = pr.node.commits.nodes[0]?.commit
+          return {
+            // Only last commit of PR is interesting
+            ...omit(pr.node, 'commits'),
+            commit: {
+              ...omit(commit, 'checkSuites'),
+              // Checksuite is per app like travis or github actions. We don't
+              // really care about the app so all check runs in a single list works
+              // for now
+              flattenedCheckRuns: commit.checkSuites.nodes.flatMap(
+                (checkSuite: any) => checkSuite.checkRuns.nodes
+              )
+            }
           }
-        }
-      })
-    )
-  )
+        })
+      )
+    } catch (err) {
+      if (err instanceof z.ZodError)
+        console.log(
+          'Input object:',
+          inspect(res, { colors: true, depth: Infinity })
+        )
+      throw err
+    }
+  })
 }
 
 type GraphQLClientOptions = {
@@ -222,7 +236,7 @@ export const makeGqlClient =
 
 // The api base url should probably be configurable because you can't
 // reliably determine the base url like this
-export function formatGithubApiBaseUrl(repoHost: string): string {
-  if (repoHost === 'github.com') return 'https://api.github.com'
-  else return `https://${repoHost}/api`
+export function formatGithubApiBaseUrl(repositoryHost: string): string {
+  if (repositoryHost === 'github.com') return 'https://api.github.com'
+  else return `https://${repositoryHost}/api`
 }

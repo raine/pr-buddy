@@ -9,7 +9,10 @@ module.exports = {
         // Silence deprecation warning
         ..._.omit(colors, ['lightBlue']),
         sky: colors.lightBlue,
-        gray: colors.coolGray,
+        gray: {
+          ...colors.coolGray,
+          150: '#ECEDEF'
+        },
         'status-red': '#CB2431',
         'status-green': '#28A745',
         'status-yellow': '#DBAB07'

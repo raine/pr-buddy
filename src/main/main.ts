@@ -1,23 +1,17 @@
-/**
- * This module executes inside of electron's main process. You can start
- * electron renderer process from here and communicate with the other processes
- * through IPC.
- *
- * When running `npm run build` or `npm run build:main`, this file is compiled to
- * `./src/main.js` using webpack. This gives us some performance wins.
- */
-import './fix-dev-user-data'
 import 'core-js/stable'
-import 'regenerator-runtime/runtime'
-import path from 'path'
 import { app, BrowserWindow, shell } from 'electron'
 import log from 'electron-log'
-import buildMenu from './menu'
-import { resolveHtmlPath } from './util'
-import { debounce } from 'lodash'
 import type WindowStateKeeper from 'electron-window-state'
-
+import { debounce } from 'lodash'
+import path from 'path'
+import querystring from 'querystring'
+import 'regenerator-runtime/runtime'
+import { InitData } from '../renderer/renderer'
 import './api'
+import './fix-dev-user-data'
+import buildMenu from './menu'
+import { getAssetPath, resolveHtmlPath } from './util'
+import * as settings from './settings'
 
 log.catchErrors({
   showDialog: true
@@ -49,16 +43,7 @@ const installExtensions = async () => {
 }
 
 const createWindow = async () => {
-  if (isDevelopment) {
-    await installExtensions()
-  }
-
-  const RESOURCES_PATH = app.isPackaged
-    ? path.join(process.resourcesPath, 'assets')
-    : path.join(__dirname, '../../assets')
-
-  const getAssetPath = (...paths: string[]): string =>
-    path.join(RESOURCES_PATH, ...paths)
+  if (isDevelopment) await installExtensions()
 
   const windowStateKeeper: (
     opts: WindowStateKeeper.Options
@@ -80,6 +65,8 @@ const createWindow = async () => {
     }
   })
 
+  const initData: InitData = await settings.get()
+
   const debouncedSaveWindowState = debounce(
     (event: any) => mainWindowState.saveState(event.sender),
     500
@@ -88,12 +75,14 @@ const createWindow = async () => {
   mainWindow.on('resize', debouncedSaveWindowState)
   mainWindow.on('move', debouncedSaveWindowState)
 
-  void mainWindow.loadURL(resolveHtmlPath('index.html'))
+  void mainWindow.loadURL(
+    resolveHtmlPath('index.html') +
+      '?' +
+      querystring.stringify({ initData: JSON.stringify(initData) })
+  )
 
   mainWindow.on('ready-to-show', () => {
-    if (!mainWindow) {
-      throw new Error('"mainWindow" is not defined')
-    }
+    if (!mainWindow) throw new Error('"mainWindow" is not defined')
     if (process.env.START_MINIMIZED) {
       mainWindow.minimize()
     } else {

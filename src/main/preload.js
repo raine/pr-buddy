@@ -1,5 +1,9 @@
 const { contextBridge, ipcRenderer } = require('electron')
-const API_FNS = ['fetchPullRequests', 'rebaseBranchOnLatestBase']
+const API_FNS = [
+  'fetchPullRequests',
+  'rebaseBranchOnLatestBase',
+  'showOpenRepositoryDialog'
+]
 
 contextBridge.exposeInMainWorld('electronAPI', {
   ...Object.fromEntries(
