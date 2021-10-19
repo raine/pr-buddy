@@ -10,6 +10,7 @@ import './fix-dev-user-data'
 import buildMenu from './menu'
 import { getAssetPath, resolveHtmlPath } from './util'
 import * as settings from './settings'
+import { AppState } from '../renderer/App'
 
 log.catchErrors({
   showDialog: true
@@ -64,6 +65,15 @@ export const createWindow = async (initData: InitData) => {
     } else {
       mainWindow.show()
       mainWindow.focus()
+    }
+  })
+
+  mainWindow.on('close', async () => {
+    const { repositoryPath }: AppState =
+      await mainWindow.webContents.executeJavaScript('window.appState')
+
+    if (repositoryPath) {
+      await settings.set({ lastRepositoryPath: repositoryPath })
     }
   })
 
