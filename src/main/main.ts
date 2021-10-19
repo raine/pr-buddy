@@ -1,8 +1,6 @@
 import 'core-js/stable'
 import { app, BrowserWindow, shell } from 'electron'
 import log from 'electron-log'
-import type WindowStateKeeper from 'electron-window-state'
-import { debounce } from 'lodash'
 import path from 'path'
 import querystring from 'querystring'
 import 'regenerator-runtime/runtime'
@@ -43,33 +41,15 @@ const installExtensions = async () => {
 export const createWindow = async (initData: InitData) => {
   if (isDevelopment) await installExtensions()
 
-  const windowStateKeeper: (
-    opts: WindowStateKeeper.Options
-  ) => WindowStateKeeper.State = require('electron-window-state')
-  const mainWindowState = windowStateKeeper({
-    defaultWidth: 600,
-    defaultHeight: 400
-  })
-
   const mainWindow = new BrowserWindow({
     show: true,
-    x: mainWindowState.x,
-    y: mainWindowState.y,
-    width: mainWindowState.width,
-    height: mainWindowState.height,
+    width: 600,
+    height: 400,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
     }
   })
-
-  const debouncedSaveWindowState = debounce(
-    (event: any) => mainWindowState.saveState(event.sender),
-    500
-  )
-
-  mainWindow.on('resize', debouncedSaveWindowState)
-  mainWindow.on('move', debouncedSaveWindowState)
 
   void mainWindow.loadURL(
     resolveHtmlPath('index.html') +
