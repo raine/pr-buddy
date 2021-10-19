@@ -1,6 +1,5 @@
 import React from 'react'
 import { useQuery, useQueryClient } from 'react-query'
-import { useTitle } from 'react-use'
 import useMessages from './hooks/useMessages'
 import PullRequestListItem from './PullRequestListItem'
 
@@ -27,13 +26,12 @@ export default function PullRequestList({
       void queryClient.invalidateQueries('pull-requests')
   })
 
-  useTitle(
-    'PR Buddy' +
-      (data?.remoteRepoPath !== undefined ? ` - ${data?.remoteRepoPath}` : '')
-  )
-
   if (isLoading) {
-    return <div>Loading...</div>
+    return (
+      <div className="flex items-center justify-center h-[85vh]">
+        <div className="text-3xl text-gray-400">Loading...</div>
+      </div>
+    )
   } else {
     return (
       <div>
