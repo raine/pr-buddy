@@ -1,6 +1,8 @@
 {
   "name": "pr-buddy",
   "productName": "PR Buddy",
+  "description": "A tool for managing open PRs on GitHub",
+  "author": "Raine Virta <raine.virta@gmail.com>",
   "scripts": {
     "build": "concurrently 'yarn build:main' 'yarn build:renderer'",
     "build:main": "NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./erb/configs/webpack.config.main.prod.js",
