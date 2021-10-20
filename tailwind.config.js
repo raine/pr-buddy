@@ -8,7 +8,6 @@ module.exports = {
       colors: {
         // Silence deprecation warning
         ..._.omit(colors, ['lightBlue']),
-        sky: colors.lightBlue,
         gray: {
           ...colors.coolGray,
           150: '#ECEDEF'
