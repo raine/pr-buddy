@@ -1,13 +1,14 @@
 const colors = require('tailwindcss/colors')
-const _ = require('lodash')
+
+// Silence deprecation warning
+delete colors['lightBlue']
 
 module.exports = {
   mode: 'jit',
   theme: {
     extend: {
       colors: {
-        // Silence deprecation warning
-        ..._.omit(colors, ['lightBlue']),
+        ...colors,
         gray: {
           ...colors.coolGray,
           150: '#ECEDEF'
