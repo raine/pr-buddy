@@ -15,6 +15,7 @@ import {
   makeGqlClient,
   PullRequest
 } from './github'
+import * as settings from './settings'
 
 export type LocalBranchesUpToDateMap = {
   [headRefName: string]: boolean
@@ -91,7 +92,8 @@ export async function fetchPullRequests(
   const gql = makeGqlClient({ githubApiBaseUrl, githubApiToken })
   const { login } = await getUser(gql)
   const pullRequests = await getLatestPrsStatuses(gql, remoteRepoPath, login)
-  const git = makeGit(repositoryPath)
+  const { gitBinPath } = await settings.get()
+  const git = makeGit(repositoryPath, gitBinPath)
   const headRefNames = pullRequests.map((pr) => pr.headRefName)
   const baseRefNames = [...new Set(pullRequests.map((pr) => pr.baseRefName))]
 
@@ -133,7 +135,8 @@ export async function rebaseBranchOnLatestBase(
   | { result: 'FAILED_TO_REBASE'; message: string | undefined }
 > {
   const emit = emitMessageToWindow(this)
-  const git = makeGit(repositoryPath)
+  const { gitBinPath } = await settings.get()
+  const git = makeGit(repositoryPath, gitBinPath)
   emit({ type: 'REBASE', branch: headRefName, status: 'GIT_FETCH' })
   await fetchBranches(git, 'origin', [baseRefName, headRefName])
   emit({ type: 'REBASE', branch: headRefName, status: 'REBASE' })

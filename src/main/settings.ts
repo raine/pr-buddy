@@ -3,7 +3,8 @@ import { z } from 'zod'
 
 const Settings = z
   .object({
-    lastRepositoryPath: z.string()
+    lastRepositoryPath: z.string(),
+    gitBinPath: z.string()
   })
   .partial()
 
