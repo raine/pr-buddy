@@ -49,9 +49,14 @@ export function parseRemoteUrl(url: string): RemoteUrlData {
 
 type GitCommand = typeof exec & { spawn: typeof spawn }
 
-export const makeGit = (repositoryPath: string): GitCommand => {
+export const makeGit = (
+  repositoryPath: string,
+  gitBinPath?: string
+): GitCommand => {
+  const gitBin = gitBinPath ?? 'git'
   const env = { GIT_SSH_COMMAND: 'ssh -o BatchMode=yes' }
-  const makeCmd = (command: string) => `git -C ${repositoryPath} ${command}`
+  const makeCmd = (command: string) =>
+    `${gitBin} -C ${repositoryPath} ${command}`
   const _exec: typeof exec = (command) => exec(makeCmd(command), env)
   const _spawn: typeof spawn = (command, outputCallback) =>
     spawn(makeCmd(command), outputCallback, env)
