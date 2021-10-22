@@ -11,6 +11,13 @@ import buildMenu from './menu'
 import { getAssetPath, resolveHtmlPath } from './util'
 import * as settings from './settings'
 import { AppState } from '../renderer/App'
+import Debug from 'debug'
+
+// Send `debug` output to /Users/$USER/Library/Logs/PR\ Buddy/main.log (on Mac)
+if (process.env.NODE_ENV !== 'development') {
+  Debug.enable('pr-buddy:*')
+  Debug.log = log.info.bind(log)
+}
 
 log.catchErrors({
   showDialog: true
