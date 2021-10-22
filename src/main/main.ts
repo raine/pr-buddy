@@ -113,7 +113,7 @@ app
     void createWindow({ repositoryPath: lastRepositoryPath })
 
     app.on('activate', async () => {
-      const windows = BrowserWindow.getAllWindows().filter((b) => b.isVisible())
+      const windows = BrowserWindow.getAllWindows()
       if (!windows.length) {
         const { lastRepositoryPath } = await settings.get()
         void createWindow({ repositoryPath: lastRepositoryPath })
