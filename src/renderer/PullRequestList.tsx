@@ -1,5 +1,6 @@
 import React from 'react'
 import { useQuery, useQueryClient } from 'react-query'
+import { useTitle } from 'react-use'
 import useMessages from './hooks/useMessages'
 import PullRequestListItem from './PullRequestListItem'
 
@@ -19,6 +20,11 @@ export default function PullRequestList({
       refetchInterval: 60000,
       refetchIntervalInBackground: true
     }
+  )
+
+  useTitle(
+    'PR Buddy' +
+      (data?.remoteRepoPath !== undefined ? ` - ${data?.remoteRepoPath}` : '')
   )
 
   useMessages((message) => {
