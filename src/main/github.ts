@@ -14,7 +14,7 @@ const GithubUser = z.object({
 })
 export type GithubUser = z.infer<typeof GithubUser>
 
-export const getUser = (gql: GQL) =>
+export const getUser = (gql: GQL): Promise<GithubUser> =>
   gql(
     `
 {
@@ -120,7 +120,7 @@ export const getLatestPrsStatuses = async (
   gql: GQL,
   repo: string,
   author: string
-) => {
+): Promise<LatestPullRequestsStatuses> => {
   const q = `repo:${repo} author:${author} is:open type:pr`
   const query = `# gql
 query($q: String!) {

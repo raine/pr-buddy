@@ -17,18 +17,6 @@ import {
 } from './github'
 import * as settings from './settings'
 
-export type LocalBranchesUpToDateMap = {
-  [headRefName: string]: boolean
-}
-
-export type FetchPullRequests = {
-  // This data comes from github
-  pullRequests: LatestPullRequestsStatuses
-  // This data comes from git command
-  localBranchesUpToDateMap: LocalBranchesUpToDateMap
-  remoteRepoPath: string
-}
-
 export type RebaseStatusMessageData =
   | {
       type: 'REBASE'
@@ -77,7 +65,18 @@ export const emitMessageToWindow =
     window.webContents.send('message', data)
   }
 
-// TODO: get window from event and emit to that window
+export type LocalBranchesUpToDateMap = {
+  [headRefName: string]: boolean
+}
+
+export type FetchPullRequests = {
+  // This data comes from github
+  pullRequests: LatestPullRequestsStatuses
+  // This data comes from git command
+  localBranchesUpToDateMap: LocalBranchesUpToDateMap
+  remoteRepoPath: string
+}
+
 export async function fetchPullRequests(
   this: BrowserWindow,
   repositoryPath: string
@@ -124,7 +123,6 @@ export async function fetchPullRequests(
   }
 }
 
-// TODO: get window from event and emit to that window
 export async function rebaseBranchOnLatestBase(
   this: BrowserWindow,
   repositoryPath: string,
@@ -189,13 +187,16 @@ function browserWindowFromEvent(
 }
 
 ipcMain.handle('fetchPullRequests', (event, ...args) =>
-  (fetchPullRequests as Function).bind(browserWindowFromEvent(event))(...args)
+  (fetchPullRequests as Function)
+    .bind(browserWindowFromEvent(event))(...args)
+    //@ts-ignore
+    .catch((err: any) => ({ error: err.message }))
 )
 
 ipcMain.handle('rebaseBranchOnLatestBase', (event, ...args) =>
-  (rebaseBranchOnLatestBase as Function).bind(browserWindowFromEvent(event))(
-    ...args
-  )
+  (rebaseBranchOnLatestBase as Function)
+    .bind(browserWindowFromEvent(event))(...args)
+    .catch((err: any) => ({ error: err.message }))
 )
 
 ipcMain.handle('showOpenRepositoryDialog', (event, ...args) =>
