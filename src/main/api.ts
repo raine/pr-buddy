@@ -82,44 +82,46 @@ export async function fetchPullRequests(
   repositoryPath: string
 ): Promise<FetchPullRequests> {
   const emit = emitMessageToWindow(this)
-  emit({ type: 'FETCH_PULL_REQUESTS', status: 'START' })
-  const repoConfig = await getRepositoryConfig(repositoryPath)
-  const { remoteRepoPath, remoteName, repositoryHost, githubApiToken } =
-    repoConfig
-  if (!githubApiToken) throw new Error('No github api token in the config')
-  const githubApiBaseUrl = formatGithubApiBaseUrl(repositoryHost)
-  const gql = makeGqlClient({ githubApiBaseUrl, githubApiToken })
-  const { login } = await getUser(gql)
-  const pullRequests = await getLatestPrsStatuses(gql, remoteRepoPath, login)
-  const { gitBinPath } = await settings.get()
-  const git = makeGit(repositoryPath, gitBinPath)
-  const headRefNames = pullRequests.map((pr) => pr.headRefName)
-  const baseRefNames = [...new Set(pullRequests.map((pr) => pr.baseRefName))]
+  try {
+    emit({ type: 'FETCH_PULL_REQUESTS', status: 'START' })
+    const repoConfig = await getRepositoryConfig(repositoryPath)
+    const { remoteRepoPath, remoteName, repositoryHost, githubApiToken } =
+      repoConfig
+    if (!githubApiToken) throw new Error('No github api token in the config')
+    const githubApiBaseUrl = formatGithubApiBaseUrl(repositoryHost)
+    const gql = makeGqlClient({ githubApiBaseUrl, githubApiToken })
+    const { login } = await getUser(gql)
+    const pullRequests = await getLatestPrsStatuses(gql, remoteRepoPath, login)
+    const { gitBinPath } = await settings.get()
+    const git = makeGit(repositoryPath, gitBinPath)
+    const headRefNames = pullRequests.map((pr) => pr.headRefName)
+    const baseRefNames = [...new Set(pullRequests.map((pr) => pr.baseRefName))]
 
-  // With git command, check up-to-date-with-master status of PR's branches
-  await fetchBranches(git, remoteName, [...headRefNames, ...baseRefNames])
-  const localBranchesUpToDateMap = await pReduce<
-    PullRequest,
-    FetchPullRequests['localBranchesUpToDateMap']
-  >(
-    pullRequests,
-    async (acc, pr) => ({
-      ...acc,
-      [pr.headRefName]: await isBranchUpToDate(
-        git,
-        `${remoteName}/${pr.baseRefName}`,
-        `${remoteName}/${pr.headRefName}`
-      )
-    }),
-    {}
-  )
+    // With git command, check up-to-date-with-master status of PR's branches
+    await fetchBranches(git, remoteName, [...headRefNames, ...baseRefNames])
+    const localBranchesUpToDateMap = await pReduce<
+      PullRequest,
+      FetchPullRequests['localBranchesUpToDateMap']
+    >(
+      pullRequests,
+      async (acc, pr) => ({
+        ...acc,
+        [pr.headRefName]: await isBranchUpToDate(
+          git,
+          `${remoteName}/${pr.baseRefName}`,
+          `${remoteName}/${pr.headRefName}`
+        )
+      }),
+      {}
+    )
 
-  emit({ type: 'FETCH_PULL_REQUESTS', status: 'COMPLETE' })
-
-  return {
-    pullRequests,
-    localBranchesUpToDateMap,
-    remoteRepoPath
+    return {
+      pullRequests,
+      localBranchesUpToDateMap,
+      remoteRepoPath
+    }
+  } finally {
+    emit({ type: 'FETCH_PULL_REQUESTS', status: 'COMPLETE' })
   }
 }
 
@@ -187,16 +189,13 @@ function browserWindowFromEvent(
 }
 
 ipcMain.handle('fetchPullRequests', (event, ...args) =>
-  (fetchPullRequests as Function)
-    .bind(browserWindowFromEvent(event))(...args)
-    //@ts-ignore
-    .catch((err: any) => ({ error: err.message }))
+  (fetchPullRequests as Function).bind(browserWindowFromEvent(event))(...args)
 )
 
 ipcMain.handle('rebaseBranchOnLatestBase', (event, ...args) =>
-  (rebaseBranchOnLatestBase as Function)
-    .bind(browserWindowFromEvent(event))(...args)
-    .catch((err: any) => ({ error: err.message }))
+  (rebaseBranchOnLatestBase as Function).bind(browserWindowFromEvent(event))(
+    ...args
+  )
 )
 
 ipcMain.handle('showOpenRepositoryDialog', (event, ...args) =>
