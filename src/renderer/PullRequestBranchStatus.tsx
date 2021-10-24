@@ -36,9 +36,7 @@ const Progress = ({ children }: { children: React.ReactNode }) => (
   </span>
 )
 
-export default function PullRequestBranchStatus(
-  props: PullRequestBranchStatusProps
-) {
+function PullRequestBranchStatus(props: PullRequestBranchStatusProps) {
   const { baseRefName, headRefName } = props
   const defaultBranchStatus = match(props)
     .with({ rebaseFailed: true }, () => (
@@ -99,3 +97,5 @@ export default function PullRequestBranchStatus(
     </div>
   )
 }
+
+export default React.memo(PullRequestBranchStatus)
