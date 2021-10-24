@@ -1,6 +1,7 @@
 import React from 'react'
 import { useQuery, useQueryClient } from 'react-query'
 import { useTitle } from 'react-use'
+import { useHistory } from 'react-router-dom'
 import useMessages from './hooks/useMessages'
 import PullRequestListItem from './PullRequestListItem'
 
@@ -12,6 +13,7 @@ export default function PullRequestList({
   repositoryPath
 }: PullRequestListProps) {
   const queryClient = useQueryClient()
+  const history = useHistory()
 
   const { isLoading, data, error, isFetched } = useQuery(
     'pull-requests',
@@ -30,13 +32,23 @@ export default function PullRequestList({
       }),
     {
       refetchInterval: 60000,
-      refetchIntervalInBackground: true
+      refetchIntervalInBackground: true,
+      retry: false,
+      onSuccess: ({ result, remoteRepoPath }) => {
+        if (result === 'NO_TOKEN_IN_GIT_CONFIG') {
+          history.push('/set-api-token', {
+            remoteRepoPath: remoteRepoPath
+          })
+        }
+      }
     }
   )
 
   useTitle(
     'PR Buddy' +
-      (data?.remoteRepoPath !== undefined ? ` - ${data.remoteRepoPath}` : '')
+      (data?.result === 'OK' && data.remoteRepoPath !== undefined
+        ? ` - ${data.remoteRepoPath}`
+        : '')
   )
 
   useMessages((message) => {
@@ -58,14 +70,15 @@ export default function PullRequestList({
             ERROR: Could not fetch pull requests from GitHub
           </div>
         )}
-        {data?.pullRequests.map((pr) => (
-          <PullRequestListItem
-            key={pr.url}
-            repositoryPath={repositoryPath}
-            localBranchesUpToDateMap={data.localBranchesUpToDateMap}
-            {...pr}
-          />
-        ))}
+        {data?.result === 'OK' &&
+          data.pullRequests.map((pr) => (
+            <PullRequestListItem
+              key={pr.url}
+              repositoryPath={repositoryPath}
+              localBranchesUpToDateMap={data.localBranchesUpToDateMap}
+              {...pr}
+            />
+          ))}
       </div>
     )
   }

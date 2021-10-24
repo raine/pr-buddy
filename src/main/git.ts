@@ -3,6 +3,19 @@ import ini from 'ini'
 import * as path from 'path'
 import { MessageData } from './api'
 import { exec, ExecResult, spawn } from './sh'
+import { z } from 'zod'
+
+const GitConfig = z.object({
+  'remote "origin"': z.object({
+    url: z.string()
+  }),
+  'pr-buddy': z
+    .object({
+      'github-api-token': z.string()
+    })
+    .optional()
+    .optional()
+})
 
 export async function readRepositoryGitConfig(repoPath: string) {
   const configPath = path.join(repoPath, '.git/config')
@@ -22,10 +35,9 @@ type RepoConfig = RemoteUrlData & {
 export async function getRepositoryConfig(
   repoPath: string
 ): Promise<RepoConfig> {
-  const config = await readRepositoryGitConfig(repoPath)
-  const remoteUrl = config['remote "origin"']?.url
-  const githubApiToken = config['pr-buddy']['github-api-token']
-  if (!remoteUrl) throw new Error('Could not parse repository origin url')
+  const config = GitConfig.parse(await readRepositoryGitConfig(repoPath))
+  const remoteUrl = config['remote "origin"'].url
+  const githubApiToken = config['pr-buddy']?.['github-api-token']
   return {
     ...parseRemoteUrl(remoteUrl),
     githubApiToken,

@@ -6,10 +6,12 @@ html {
   font-size: 13px;
 }
 
-*,
 a,
 button {
   cursor: default;
+}
+
+#root {
   user-select: none;
 }
 
