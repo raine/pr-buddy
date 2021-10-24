@@ -13,9 +13,21 @@ export default function PullRequestList({
 }: PullRequestListProps) {
   const queryClient = useQueryClient()
 
-  const { isLoading, data } = useQuery(
+  const { isLoading, data, error, isFetched } = useQuery(
     'pull-requests',
-    () => window.electronAPI.fetchPullRequests(repositoryPath),
+    () =>
+      window.electronAPI.fetchPullRequests(repositoryPath).catch((err) => {
+        // Quick and dirty expected errors
+        // Throwing strings because error objects are not useful here
+        // https://github.com/electron/electron/issues/24427
+        if (err.message.includes('HttpError: Bad credentials')) {
+          throw 'GITHUB_BAD_CREDENTIALS'
+        } else if (err.message.includes('HttpError')) {
+          throw 'GENERIC_HTTP_ERROR'
+        } else {
+          throw err
+        }
+      }),
     {
       refetchInterval: 60000,
       refetchIntervalInBackground: true
@@ -24,7 +36,7 @@ export default function PullRequestList({
 
   useTitle(
     'PR Buddy' +
-      (data?.remoteRepoPath !== undefined ? ` - ${data?.remoteRepoPath}` : '')
+      (data?.remoteRepoPath !== undefined ? ` - ${data.remoteRepoPath}` : '')
   )
 
   useMessages((message) => {
@@ -32,7 +44,7 @@ export default function PullRequestList({
       void queryClient.invalidateQueries('pull-requests')
   })
 
-  if (isLoading) {
+  if (!isFetched && isLoading) {
     return (
       <div className="flex items-center justify-center h-[85vh]">
         <div className="text-3xl text-gray-400">Loading...</div>
@@ -41,6 +53,11 @@ export default function PullRequestList({
   } else {
     return (
       <div>
+        {error === 'GENERIC_HTTP_ERROR' && (
+          <div className="text-sm bg-red-500 text-gray-100 rounded px-4 py-2 mb-2 text-shadow-sm">
+            ERROR: Could not fetch pull requests from GitHub
+          </div>
+        )}
         {data?.pullRequests.map((pr) => (
           <PullRequestListItem
             key={pr.url}

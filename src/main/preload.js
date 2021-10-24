@@ -9,11 +9,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   ...Object.fromEntries(
     API_FNS.map((fnName) => [
       fnName,
-      (...args) =>
-        ipcRenderer.invoke(fnName, ...args).then((res) => {
-          if (res.error) throw new Error(res.error)
-          else return res
-        })
+      (...args) => ipcRenderer.invoke(fnName, ...args)
     ])
   ),
 
