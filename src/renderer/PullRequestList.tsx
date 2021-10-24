@@ -64,7 +64,7 @@ export default function PullRequestList({
     )
   } else {
     return (
-      <div>
+      <div className="p-5">
         {error === 'GENERIC_HTTP_ERROR' && (
           <div className="text-sm bg-red-500 text-gray-100 rounded px-4 py-2 mb-2 text-shadow-sm">
             ERROR: Could not fetch pull requests from GitHub
