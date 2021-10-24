@@ -71,6 +71,7 @@ export default function PullRequestList({
           </div>
         )}
         {data?.result === 'OK' &&
+          !!data.pullRequests.length &&
           data.pullRequests.map((pr) => (
             <PullRequestListItem
               key={pr.url}
@@ -79,6 +80,21 @@ export default function PullRequestList({
               {...pr}
             />
           ))}
+        {data?.result === 'OK' && !data.pullRequests.length && (
+          <div className="flex items-center justify-center h-[85vh] flex-col">
+            <div className="text-2xl text-gray-600 font-normal">
+              You have no open pull requests in{' '}
+              <span className="font-medium">{data.remoteRepoPath}</span>
+            </div>
+            <div className="text-gray-400 mt-6 text-sm">
+              Tip: Hit{' '}
+              <div className="inline-block border px-[2px] border-gray-200 rounded">
+                Command-R
+              </div>{' '}
+              to reload
+            </div>
+          </div>
+        )}
       </div>
     )
   }
