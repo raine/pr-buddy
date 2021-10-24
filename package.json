@@ -14,7 +14,7 @@
     "dev": "node ./erb/scripts/check-port-in-use.js && yarn dev:renderer",
     "dev:main": "NODE_ENV=development electron -r ts-node/register/transpile-only ./src/main/main.ts",
     "dev:renderer": "NODE_ENV=development webpack serve --config ./erb/configs/webpack.config.renderer.dev.js",
-    "dev:script": "ts-node-dev --files --no-notify --respawn --project tsconfig.json",
+    "dev:script": "TS_NODE_TRANSPILE_ONLY=true ts-node-dev --files --no-notify --respawn --project tsconfig.json",
     "format": "prettier --write ."
   },
   "license": "MIT",

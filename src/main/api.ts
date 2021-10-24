@@ -69,7 +69,10 @@ export type LocalBranchesUpToDateMap = {
   [headRefName: string]: boolean
 }
 
-export type FetchPullRequests = {
+export type FetchPullRequestsResponse = FetchPullRequestsOk | NoTokenInGitConfig
+
+export type FetchPullRequestsOk = {
+  result: 'OK'
   // This data comes from github
   pullRequests: LatestPullRequestsStatuses
   // This data comes from git command
@@ -77,17 +80,27 @@ export type FetchPullRequests = {
   remoteRepoPath: string
 }
 
+export type NoTokenInGitConfig = {
+  result: 'NO_TOKEN_IN_GIT_CONFIG'
+  remoteRepoPath: string
+}
+
 export async function fetchPullRequests(
   this: BrowserWindow,
   repositoryPath: string
-): Promise<FetchPullRequests> {
+): Promise<FetchPullRequestsOk | NoTokenInGitConfig> {
   const emit = emitMessageToWindow(this)
   try {
     emit({ type: 'FETCH_PULL_REQUESTS', status: 'START' })
     const repoConfig = await getRepositoryConfig(repositoryPath)
     const { remoteRepoPath, remoteName, repositoryHost, githubApiToken } =
       repoConfig
-    if (!githubApiToken) throw new Error('No github api token in the config')
+    if (!githubApiToken)
+      return {
+        result: 'NO_TOKEN_IN_GIT_CONFIG',
+        remoteRepoPath
+      }
+
     const githubApiBaseUrl = formatGithubApiBaseUrl(repositoryHost)
     const gql = makeGqlClient({ githubApiBaseUrl, githubApiToken })
     const { login } = await getUser(gql)
@@ -101,7 +114,7 @@ export async function fetchPullRequests(
     await fetchBranches(git, remoteName, [...headRefNames, ...baseRefNames])
     const localBranchesUpToDateMap = await pReduce<
       PullRequest,
-      FetchPullRequests['localBranchesUpToDateMap']
+      FetchPullRequestsOk['localBranchesUpToDateMap']
     >(
       pullRequests,
       async (acc, pr) => ({
@@ -116,6 +129,7 @@ export async function fetchPullRequests(
     )
 
     return {
+      result: 'OK',
       pullRequests,
       localBranchesUpToDateMap,
       remoteRepoPath
@@ -131,7 +145,7 @@ export async function rebaseBranchOnLatestBase(
   headRefName: string,
   baseRefName: string
 ): Promise<
-  | { result: 'OK'; pullRequests: FetchPullRequests }
+  | { result: 'OK'; pullRequests: FetchPullRequestsOk }
   | { result: 'FAILED_TO_REBASE'; message: string | undefined }
 > {
   const emit = emitMessageToWindow(this)
@@ -149,9 +163,14 @@ export async function rebaseBranchOnLatestBase(
         // - With this, we can keep the rebase button disabled as long as
         //   mutation call is loading
         emit({ type: 'FETCH_PULL_REQUESTS', status: 'START' })
+        const pullRequests = await fetchPullRequests.bind(this)(repositoryPath)
+        if (pullRequests.result === 'NO_TOKEN_IN_GIT_CONFIG') {
+          throw Error('No token in git config')
+        }
+
         return {
           ...res,
-          pullRequests: await fetchPullRequests.bind(this)(repositoryPath)
+          pullRequests
         }
       } else {
         return res
