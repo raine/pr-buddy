@@ -13,9 +13,9 @@ function ApiTokenSetup({ remoteRepoPath, repositoryPath }: ApiTokenSetupProps) {
 
   return (
     <div className="w-4/6 mx-auto mt-10">
-      <h1 className="text-2xl text-gray-800 font-medium">
+      <h1 className="text-2xl text-gray-800">
         Set up a GitHub API token for{' '}
-        <span className="font-normal">{remoteRepoPath}</span>
+        <span className="font-medium">{remoteRepoPath}</span>
       </h1>
       <div className="mt-4 text-gray-800">
         <div className="font-medium mb-3">1. Create an API token</div>
