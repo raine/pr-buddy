@@ -58,7 +58,8 @@ export const createWindow = async (initData: InitData) => {
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
-    }
+    },
+    backgroundColor: '#fff'
   })
 
   void mainWindow.loadURL(
