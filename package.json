@@ -15,7 +15,9 @@
     "dev:main": "NODE_ENV=development electron -r ts-node/register/transpile-only ./src/main/main.ts",
     "dev:renderer": "NODE_ENV=development webpack serve --config ./erb/configs/webpack.config.renderer.dev.js",
     "dev:script": "TS_NODE_TRANSPILE_ONLY=true ts-node-dev --files --no-notify --respawn --project tsconfig.json",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "test:types": "tsc --noEmit",
+    "test": "run test:types"
   },
   "license": "MIT",
   "devDependencies": {
