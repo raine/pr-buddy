@@ -30,12 +30,8 @@ function ApiTokenSetup({
         retrieving your open pull requests from GitHub.
         <div className="mt-2">
           You can create one at:{' '}
-          <a
-            className="text-sky-700"
-            target="_blank"
-            href="https://github.com/settings/tokens/new"
-          >
-            https://github.com/settings/tokens/new
+          <a className="text-sky-700" target="_blank" href={newTokenGithubUrl}>
+            {newTokenGithubUrl}
           </a>
         </div>
         <div className="font-medium mt-4 mb-3">

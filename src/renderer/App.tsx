@@ -51,6 +51,7 @@ export default function App(props: AppProps) {
               <ApiTokenSetup
                 remoteRepoPath={location.state.remoteRepoPath}
                 repositoryPath={repositoryPath!}
+                repositoryHost={location.state.repositoryHost}
               />
             )}
           />

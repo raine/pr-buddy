@@ -83,6 +83,7 @@ export type FetchPullRequestsOk = {
 export type NoTokenInGitConfig = {
   result: 'NO_TOKEN_IN_GIT_CONFIG'
   remoteRepoPath: string
+  repositoryHost: string
 }
 
 export async function fetchPullRequests(
@@ -98,7 +99,8 @@ export async function fetchPullRequests(
     if (!githubApiToken)
       return {
         result: 'NO_TOKEN_IN_GIT_CONFIG',
-        remoteRepoPath
+        remoteRepoPath,
+        repositoryHost
       }
 
     const githubApiBaseUrl = formatGithubApiBaseUrl(repositoryHost)

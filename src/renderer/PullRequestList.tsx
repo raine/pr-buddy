@@ -34,10 +34,11 @@ export default function PullRequestList({
       refetchInterval: 60000,
       refetchIntervalInBackground: true,
       retry: false,
-      onSuccess: ({ result, remoteRepoPath }) => {
-        if (result === 'NO_TOKEN_IN_GIT_CONFIG') {
+      onSuccess: (res) => {
+        if (res.result === 'NO_TOKEN_IN_GIT_CONFIG') {
           history.push('/set-api-token', {
-            remoteRepoPath: remoteRepoPath
+            remoteRepoPath: res.remoteRepoPath,
+            repositoryHost: res.repositoryHost
           })
         }
       }
