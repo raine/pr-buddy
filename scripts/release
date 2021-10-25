@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+version_arg="$1"
+root=$(git rev-parse --show-toplevel)
+
+git diff --quiet || (echo 'Dirty worktree' && exit 1)
+rm -rf "$root"/release/build
+
+yarn test
+
+cd "$root"/release/app
+version_before="v$(jq -r .version package.json)"
+yarn version "$version_arg"
+version="v$(jq -r .version package.json)"
+
+cd "$root"
+yarn package --mac
+
+git add release/app/package.json release/app/.yarn/versions
+git commit -m "$version"
+git tag "$version"
+
+git push
+git push --tags
+
+gh release create "$version" \
+  --target master \
+  --title "$version" \
+  --notes "**Full Changelog:** [\`$version_before...$version\`](https://github.com/raine/pr-buddy/compare/$version_before...$version)"
+
+gh release upload "$version" release/build/PR\ Buddy-*.dmg
