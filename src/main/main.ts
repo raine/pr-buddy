@@ -96,6 +96,19 @@ export const createWindow = async (initData: InitData) => {
   })
 }
 
+// When quitting, save the last opened repo to be opened in next start
+app.on('before-quit', async () => {
+  const windows = BrowserWindow.getAllWindows()
+  if (windows.length > 0) {
+    const { repositoryPath }: AppState =
+      await windows[0].webContents.executeJavaScript('window.appState')
+
+    if (repositoryPath) {
+      settings.setOneSync('lastRepositoryPath', repositoryPath)
+    }
+  }
+})
+
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed

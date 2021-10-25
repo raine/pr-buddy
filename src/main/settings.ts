@@ -25,6 +25,13 @@ export async function setOne<T extends keyof Settings>(
   return settings.set(key, value)
 }
 
+export function setOneSync<T extends keyof Settings>(
+  key: T,
+  value: Required<Settings>[T]
+): void {
+  return settings.setSync(key, value)
+}
+
 export async function getOne<T extends keyof Settings>(
   key: T
 ): Promise<Settings[T]> {
