@@ -83,10 +83,7 @@ export const createWindow = async (initData: InitData) => {
       await mainWindow.webContents.executeJavaScript('window.appState')
 
     if (repositoryPath) {
-      await settings.set({
-        ...(await settings.get()),
-        lastRepositoryPath: repositoryPath
-      })
+      await settings.setOne('lastRepositoryPath', repositoryPath)
     }
   })
 

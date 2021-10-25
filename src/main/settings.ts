@@ -17,3 +17,16 @@ export async function get(): Promise<Settings> {
 export async function set(obj: Settings): Promise<void> {
   return settings.set(obj)
 }
+
+export async function setOne<T extends keyof Settings>(
+  key: T,
+  value: Required<Settings>[T]
+): Promise<void> {
+  return settings.set(key, value)
+}
+
+export async function getOne<T extends keyof Settings>(
+  key: T
+): Promise<Settings[T]> {
+  return settings.get(key) as unknown as Settings[T]
+}

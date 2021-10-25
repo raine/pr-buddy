@@ -193,6 +193,7 @@ export async function showOpenRepositoryDialog(this: BrowserWindow) {
     // TODO: Handle is not git repo?
     const repositoryPath = result.filePaths[0]
     emit({ type: 'SET_REPOSITORY_PATH', value: repositoryPath })
+    void settings.setOne('lastRepositoryPath', repositoryPath)
   }
 }
 
