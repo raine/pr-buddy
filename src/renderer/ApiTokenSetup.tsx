@@ -5,17 +5,23 @@ import { useHistory } from 'react-router-dom'
 type ApiTokenSetupProps = {
   remoteRepoPath: string
   repositoryPath: string
+  repositoryHost: string
 }
 
-function ApiTokenSetup({ remoteRepoPath, repositoryPath }: ApiTokenSetupProps) {
+function ApiTokenSetup({
+  remoteRepoPath,
+  repositoryPath,
+  repositoryHost
+}: ApiTokenSetupProps) {
   const history = useHistory()
   const queryClient = useQueryClient()
+  const newTokenGithubUrl = `https://${repositoryHost}/settings/tokens/new`
 
   return (
-    <div className="w-4/6 mx-auto mt-10">
+    <div className="w-5/6 mx-auto m-10">
       <h1 className="text-2xl text-gray-800">
         Set up a GitHub API token for{' '}
-        <span className="font-medium">{remoteRepoPath}</span>
+        <span className="font-medium whitespace-nowrap">{remoteRepoPath}</span>
       </h1>
       <div className="mt-4 text-gray-800">
         <div className="font-medium mb-3">1. Create an API token</div>
@@ -33,7 +39,7 @@ function ApiTokenSetup({ remoteRepoPath, repositoryPath }: ApiTokenSetupProps) {
           </a>
         </div>
         <div className="font-medium mt-4 mb-3">
-          2. Write to <span className="font-mono">.git/config</span>
+          2. Edit <span className="font-mono">.git/config</span>
         </div>
         Append a section like the following to{' '}
         <span className="font-mono select-text">
