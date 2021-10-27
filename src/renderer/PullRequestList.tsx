@@ -5,6 +5,7 @@ import { useHistory } from 'react-router-dom'
 import useMessages from './hooks/useMessages'
 import PullRequestListItem from './PullRequestListItem'
 import TitleBar from './TitleBar'
+import LoadingScreen from './LoadingScreen'
 
 type PullRequestListProps = {
   repositoryPath: string
@@ -59,11 +60,7 @@ export default function PullRequestList({
   })
 
   if (!isFetched && isLoading) {
-    return (
-      <div className="flex items-center justify-center h-[90vh]">
-        <div className="text-3xl text-gray-400">Loading...</div>
-      </div>
-    )
+    return <LoadingScreen />
   } else {
     return (
       <>
