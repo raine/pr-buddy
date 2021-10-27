@@ -41,7 +41,7 @@ export type RebaseStatusMessageData =
 export type RebaseStatus = RebaseStatusMessageData['status']
 
 export type FetchingPullRequestsMessageData = {
-  type: 'FETCH_PULL_REQUESTS'
+  type: 'FETCHING_PULL_REQUESTS'
   status: 'START' | 'COMPLETE'
 }
 
@@ -92,7 +92,7 @@ export async function fetchPullRequests(
 ): Promise<FetchPullRequestsOk | NoTokenInGitConfig> {
   const emit = emitMessageToWindow(this)
   try {
-    emit({ type: 'FETCH_PULL_REQUESTS', status: 'START' })
+    emit({ type: 'FETCHING_PULL_REQUESTS', status: 'START' })
     const repoConfig = await getRepositoryConfig(repositoryPath)
     const { remoteRepoPath, remoteName, repositoryHost, githubApiToken } =
       repoConfig
@@ -137,7 +137,7 @@ export async function fetchPullRequests(
       remoteRepoPath
     }
   } finally {
-    emit({ type: 'FETCH_PULL_REQUESTS', status: 'COMPLETE' })
+    emit({ type: 'FETCHING_PULL_REQUESTS', status: 'COMPLETE' })
   }
 }
 
@@ -164,7 +164,7 @@ export async function rebaseBranchOnLatestBase(
         // - We need to wait a bit to refresh PRs so that checks data is updated
         // - With this, we can keep the rebase button disabled as long as
         //   mutation call is loading
-        emit({ type: 'FETCH_PULL_REQUESTS', status: 'START' })
+        emit({ type: 'FETCHING_PULL_REQUESTS', status: 'START' })
         const pullRequests = await fetchPullRequests.bind(this)(repositoryPath)
         if (pullRequests.result === 'NO_TOKEN_IN_GIT_CONFIG') {
           throw Error('No token in git config')
