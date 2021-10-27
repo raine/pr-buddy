@@ -4,6 +4,7 @@ import { useTitle } from 'react-use'
 import { useHistory } from 'react-router-dom'
 import useMessages from './hooks/useMessages'
 import PullRequestListItem from './PullRequestListItem'
+import TitleBar from './TitleBar'
 
 type PullRequestListProps = {
   repositoryPath: string
@@ -59,44 +60,47 @@ export default function PullRequestList({
 
   if (!isFetched && isLoading) {
     return (
-      <div className="flex items-center justify-center h-[85vh]">
+      <div className="flex items-center justify-center h-[90vh]">
         <div className="text-3xl text-gray-400">Loading...</div>
       </div>
     )
   } else {
     return (
-      <div className="p-5">
-        {error === 'GENERIC_HTTP_ERROR' && (
-          <div className="font-medium bg-red-100 text-red-600 rounded px-4 py-2 mb-2 text-shadow-sm-fff">
-            Error: Could not fetch pull requests from GitHub
-          </div>
-        )}
-        {data?.result === 'OK' &&
-          !!data.pullRequests.length &&
-          data.pullRequests.map((pr) => (
-            <PullRequestListItem
-              key={pr.url}
-              repositoryPath={repositoryPath}
-              localBranchesUpToDateMap={data.localBranchesUpToDateMap}
-              {...pr}
-            />
-          ))}
-        {data?.result === 'OK' && !data.pullRequests.length && (
-          <div className="flex items-center justify-center h-[85vh] flex-col">
-            <div className="text-2xl text-gray-600 font-normal">
-              You have no open pull requests in{' '}
-              <span className="font-medium">{data.remoteRepoPath}</span>
+      <>
+        <TitleBar remoteRepoPath={data?.remoteRepoPath} />
+        <div className="p-5">
+          {error === 'GENERIC_HTTP_ERROR' && (
+            <div className="font-medium bg-red-100 text-red-600 rounded px-4 py-2 mb-4 text-shadow-sm-fff">
+              Error: Could not fetch pull requests from GitHub
             </div>
-            <div className="text-gray-400 mt-6 text-sm">
-              Tip: Hit{' '}
-              <div className="inline-block border px-[2px] border-gray-200 rounded">
-                Command-R
-              </div>{' '}
-              to reload
+          )}
+          {data?.result === 'OK' &&
+            !!data.pullRequests.length &&
+            data.pullRequests.map((pr) => (
+              <PullRequestListItem
+                key={pr.url}
+                repositoryPath={repositoryPath}
+                localBranchesUpToDateMap={data.localBranchesUpToDateMap}
+                {...pr}
+              />
+            ))}
+          {data?.result === 'OK' && !data.pullRequests.length && (
+            <div className="flex items-center justify-center h-[85vh] flex-col">
+              <div className="text-2xl text-gray-600 font-normal">
+                You have no open pull requests in{' '}
+                <span className="font-medium">{data.remoteRepoPath}</span>
+              </div>
+              <div className="text-gray-400 mt-6 text-sm">
+                Tip: Hit{' '}
+                <div className="inline-block border px-[2px] border-gray-200 rounded">
+                  Command-R
+                </div>{' '}
+                to reload
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      </>
     )
   }
 }

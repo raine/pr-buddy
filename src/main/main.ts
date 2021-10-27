@@ -59,7 +59,9 @@ export const createWindow = async (initData: InitData) => {
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
     },
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
+    titleBarStyle: 'hidden',
+    trafficLightPosition: { x: 10, y: 7 }
   })
 
   void mainWindow.loadURL(

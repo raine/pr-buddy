@@ -31,7 +31,7 @@ const RemoteBranchOutOfDate = ({
 
 const Progress = ({ children }: { children: React.ReactNode }) => (
   <span>
-    <Spinner key="spinner" size={14} />
+    <Spinner key="spinner" size={14} className="mb-[1px]" thickness={250} />
     <span className="ml-[4px]">{children}</span>
   </span>
 )
@@ -73,12 +73,6 @@ function PullRequestBranchStatus(props: PullRequestBranchStatusProps) {
             )
           )
           .with({ status: 'COMPLETE' }, def)
-          .otherwise(def)
-      )
-      .with({ type: 'FETCH_PULL_REQUESTS', status: select() }, (status) =>
-        match(status)
-          .with('START', () => <>Updating...</>)
-          .with('COMPLETE', def)
           .otherwise(def)
       )
       .otherwise(() => prevState)
