@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.2
+
+- New custom title bar with separate loading indicator.
+- UI polish.
+- Update pull requests on window focus.
+
 ## 1.0.1
 
 - Use GitHub Enterprise specific URL in API key onboarding screen, if
