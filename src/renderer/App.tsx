@@ -12,7 +12,7 @@ import PullRequestList from './PullRequestList'
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      refetchOnWindowFocus: false
+      refetchOnWindowFocus: true
     }
   }
 })
