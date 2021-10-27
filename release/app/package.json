@@ -3,7 +3,7 @@
   "productName": "PR Buddy",
   "description": "A tool for managing open PRs on GitHub",
   "author": "Raine Virta <raine.virta@gmail.com>",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "./dist/main/main.js",
   "scripts": {
     "electron-rebuild": "node ../../erb/scripts/electron-rebuild.js",
