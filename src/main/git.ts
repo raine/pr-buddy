@@ -107,6 +107,10 @@ export const rebase = async (
     stashed = true
   }
   const beforeBranch = trimmedStdout(await git(`rev-parse --abbrev-ref HEAD`))
+  const cleanup = async () => {
+    if (beforeBranch !== branch) await git(`checkout ${beforeBranch}`)
+    if (stashed) await git(`stash pop`)
+  }
   await git(`checkout ${branch}`)
   const { code: rebaseExitCode, stderr } = await git.spawn(
     `rebase origin/${base}`,
@@ -128,7 +132,7 @@ export const rebase = async (
   if (rebaseExitCode > 0) {
     const couldNotApply = stderr.match(/error: could not apply.*/)
     await git(`rebase --abort`)
-    if (beforeBranch !== branch) await git(`checkout ${beforeBranch}`)
+    await cleanup()
     return {
       result: 'FAILED_TO_REBASE' as const,
       message: couldNotApply?.[0]
@@ -136,8 +140,7 @@ export const rebase = async (
   } else {
     emitMessage({ type: 'REBASE', branch, status: 'GIT_PUSH' })
     await git(`push --force origin HEAD:${branch}`)
-    if (beforeBranch !== branch) await git(`checkout ${beforeBranch}`)
-    if (stashed) await git(`stash pop`)
+    await cleanup()
     return { result: 'OK' }
   }
 }

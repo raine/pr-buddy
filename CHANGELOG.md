@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Pop stash, if any, after failed rebase
+
 ## 1.0.2
 
 - New custom title bar with separate loading indicator.
