@@ -78,7 +78,7 @@ export default function PullRequestListItem({
           {!isUpToDateWithBase ? (
             <button
               onClick={() => rebaseMutation.mutate()}
-              className="px-5 bg-gray-50 hover:bg-gray-100 pt-2 pb-3 transition active:shadow-inner font-medium rounded-md text-normal border shadow-sm text-gray-600 border-gray-300 disabled:opacity-50 disabled:pointer-events-none"
+              className="px-5 bg-gray-50 hover:bg-gray-100 pt-2 pb-3 transition active:shadow-inner rounded-md text-normal border shadow-sm text-gray-600 border-gray-300 disabled:opacity-50 disabled:pointer-events-none"
               disabled={rebaseMutation.isLoading}
             >
               Rebase on latest master
