@@ -26,10 +26,6 @@ const Badge = ({
   </div>
 )
 
-const Mergeable = () => (
-  <Badge className="text-sky-600 border-sky-100">Mergeable</Badge>
-)
-
 const Conflicts = () => (
   <Badge className="text-amber-600 border-orange-100">Conflicts</Badge>
 )
@@ -65,10 +61,7 @@ function PullRequestBranchStatus(props: PullRequestBranchStatusProps) {
         <RemoteBranchOutOfDate baseRefName={baseRefName} />
       )}
 
-      {match(props.mergeable)
-        .with('CONFLICTING', () => <Conflicts />)
-        .with('MERGEABLE', () => <Mergeable />)
-        .otherwise(() => null)}
+      {props.mergeable === 'CONFLICTING' ? <Conflicts /> : null}
     </div>
   )
 
