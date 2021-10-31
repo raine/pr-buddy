@@ -54,10 +54,10 @@ export default function PullRequestListItem({
     <div className="mb-4 border-gray-150 border rounded-md p-3">
       <div className="flex">
         <div className="flex-grow">
-          <div className="text-md leading-snug text-gray-800 font-medium">
+          <div className="text-md leading-snug text-gray-700 font-medium">
             <a target="_blank" href={url}>
               {title}{' '}
-              <span className="font-normal text-gray-600">#{number}</span>
+              <span className="font-normal text-gray-500">#{number}</span>
             </a>
           </div>
           <PullRequestChecks commit={commit} />
