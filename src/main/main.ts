@@ -144,7 +144,5 @@ async function onAppReady(app: Electron.App) {
   })
 }
 
-app
-  .whenReady()
-  .then(() => onAppReady(app))
-  .catch(console.log)
+// electron-log will catch unhandled rejections
+void app.whenReady().then(() => onAppReady(app))
