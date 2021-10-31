@@ -12,6 +12,8 @@ import { getAssetPath, resolveHtmlPath } from './util'
 import * as settings from './settings'
 import { AppState } from '../renderer/App'
 import Debug from 'debug'
+import { fileExists } from './fs'
+import { HOMEBREW_GIT_PATH } from './git'
 
 // Send `debug` output to /Users/$USER/Library/Logs/PR\ Buddy/main.log (on Mac)
 if (process.env.NODE_ENV !== 'development') {
@@ -119,18 +121,30 @@ app.on('window-all-closed', () => {
   }
 })
 
+async function onAppReady(app: Electron.App) {
+  const { lastRepositoryPath, gitBinPath } = await settings.get()
+
+  // With prod version of the app, on mac, child_process will use default git
+  // from /usr/bin/git. Homebrew version of git is likely newer and has more
+  // compatible output with the app so prefer it.
+  if (!gitBinPath && (await fileExists(HOMEBREW_GIT_PATH))) {
+    await settings.setOne('gitBinPath', '/usr/local/bin/git')
+  }
+
+  void createWindow({
+    repositoryPath: lastRepositoryPath
+  })
+
+  app.on('activate', async () => {
+    const windows = BrowserWindow.getAllWindows()
+    if (!windows.length) {
+      const { lastRepositoryPath } = await settings.get()
+      void createWindow({ repositoryPath: lastRepositoryPath })
+    }
+  })
+}
+
 app
   .whenReady()
-  .then(async () => {
-    const { lastRepositoryPath } = await settings.get()
-    void createWindow({ repositoryPath: lastRepositoryPath })
-
-    app.on('activate', async () => {
-      const windows = BrowserWindow.getAllWindows()
-      if (!windows.length) {
-        const { lastRepositoryPath } = await settings.get()
-        void createWindow({ repositoryPath: lastRepositoryPath })
-      }
-    })
-  })
+  .then(() => onAppReady(app))
   .catch(console.log)

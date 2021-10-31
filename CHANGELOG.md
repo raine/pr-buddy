@@ -7,6 +7,8 @@
   ([`MergeableState`](https://docs.github.com/en/graphql/reference/enums#mergeablestate))
 - Like the new mergeable status, show "Up to date" and "Out of date" as new
   badge-style element.
+- Use homebrew (and hopefully newer than the mac default) version of git, if
+  available.
 
 ## 1.0.2
 

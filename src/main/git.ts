@@ -5,6 +5,8 @@ import { MessageData } from './api'
 import { exec, ExecResult, spawn } from './sh'
 import { z } from 'zod'
 
+export const HOMEBREW_GIT_PATH = '/usr/local/bin/git'
+
 const GitConfig = z.object({
   'remote "origin"': z.object({
     url: z.string()
