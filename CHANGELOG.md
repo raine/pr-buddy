@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.1.0 (Unreleased)
+## 1.1.0
 
 - Bugfix: Pop stash, if any, after failed rebase.
 - Show whether PR has conflicts or is mergeable.
