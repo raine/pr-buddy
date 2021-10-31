@@ -9,7 +9,7 @@ type PullRequestChecksProps = {
 
 function PullRequestChecks({ commit }: PullRequestChecksProps) {
   return (
-    <div className="flex my-2">
+    <div className="flex mt-2">
       {commit.status !== null || commit.flattenedCheckRuns?.length ? (
         <div className="inline-flex items-center">
           <span className="text-gray-600 font-semibold mr-2">Checks:</span>{' '}

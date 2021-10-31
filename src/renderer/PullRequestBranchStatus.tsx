@@ -1,6 +1,8 @@
+import classNames from 'classnames'
 import React, { useReducer } from 'react'
-import { match, select } from 'ts-pattern'
+import { match } from 'ts-pattern'
 import { MessageData } from '../main/api'
+import { MergeableStatus } from '../main/github'
 import useMessages from './hooks/useMessages'
 import Spinner from './Spinner'
 
@@ -9,24 +11,39 @@ type PullRequestBranchStatusProps = {
   baseRefName: string
   headRefName: string
   rebaseFailed: boolean
+  mergeable: MergeableStatus
 }
+
+const Badge = ({
+  children,
+  className
+}: {
+  children: React.ReactNode
+  className: string
+}) => (
+  <div className={classNames('inline-block px-2 rounded border', className)}>
+    {children}
+  </div>
+)
+
+const Mergeable = () => (
+  <Badge className="text-sky-600 border-sky-100">Mergeable</Badge>
+)
+
+const Conflicts = () => (
+  <Badge className="text-amber-600 border-orange-100">Conflicts</Badge>
+)
 
 const RemoteBranchUpToDate = ({
   baseRefName
 }: Pick<PullRequestBranchStatusProps, 'baseRefName'>) => (
-  <span>
-    Branch is <span className="text-green-700">up-to-date</span> with{' '}
-    {baseRefName}
-  </span>
+  <Badge className="text-green-600 border-green-100">Up to date</Badge>
 )
 
 const RemoteBranchOutOfDate = ({
   baseRefName
 }: Pick<PullRequestBranchStatusProps, 'baseRefName'>) => (
-  <span>
-    Branch is <span className="text-red-800">out-of-date</span> with{' '}
-    {baseRefName}
-  </span>
+  <Badge className="text-gray-600 border-gray-100">Out of date</Badge>
 )
 
 const Progress = ({ children }: { children: React.ReactNode }) => (
@@ -38,17 +55,22 @@ const Progress = ({ children }: { children: React.ReactNode }) => (
 
 function PullRequestBranchStatus(props: PullRequestBranchStatusProps) {
   const { baseRefName, headRefName } = props
-  const defaultBranchStatus = match(props)
-    .with({ rebaseFailed: true }, () => (
-      <span>Rebase failed! Manual rebase required</span>
-    ))
-    .with({ isUpToDateWithBase: true }, () => (
-      <RemoteBranchUpToDate baseRefName={baseRefName} />
-    ))
-    .with({ isUpToDateWithBase: false }, () => (
-      <RemoteBranchOutOfDate baseRefName={baseRefName} />
-    ))
-    .otherwise(() => null)
+  const defaultBranchStatus = props.rebaseFailed ? (
+    <span>Rebase failed! Manual rebase required</span>
+  ) : (
+    <div className="space-x-1.5">
+      {props.isUpToDateWithBase ? (
+        <RemoteBranchUpToDate baseRefName={baseRefName} />
+      ) : (
+        <RemoteBranchOutOfDate baseRefName={baseRefName} />
+      )}
+
+      {match(props.mergeable)
+        .with('CONFLICTING', () => <Conflicts />)
+        .with('MERGEABLE', () => <Mergeable />)
+        .otherwise(() => null)}
+    </div>
+  )
 
   const [branchStatus, dispatch] = useReducer<
     (
@@ -81,8 +103,10 @@ function PullRequestBranchStatus(props: PullRequestBranchStatusProps) {
   useMessages(dispatch)
 
   return (
-    <div className="text-gray-600 mt-1">
-      <span className="font-semibold">Status: </span>
+    // Height 21px avoids slight movement in layout when badges change to
+    // progress
+    <div className="text-gray-600 mt-2 flex h-[21px]">
+      <span className="font-semibold mr-2">Status:</span>
       {branchStatus === 'DEFAULT' ? (
         defaultBranchStatus
       ) : (

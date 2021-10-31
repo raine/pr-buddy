@@ -1,8 +1,12 @@
 # Changelog
 
-## Unreleased
+## 1.1.0 (Unreleased)
 
-- Pop stash, if any, after failed rebase
+- Bugfix: Pop stash, if any, after failed rebase.
+- Show whether PR has conflicts or is mergeable.
+  ([`MergeableState`](https://docs.github.com/en/graphql/reference/enums#mergeablestate))
+- Like the new mergeable status, show "Up to date" and "Out of date" as new
+  badge-style element.
 
 ## 1.0.2
 

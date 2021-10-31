@@ -23,7 +23,8 @@ export default function PullRequestListItem({
   baseRefName,
   localBranchesUpToDateMap,
   url,
-  repositoryPath
+  repositoryPath,
+  mergeable
 }: PullRequest & {
   localBranchesUpToDateMap: LocalBranchesUpToDateMap
   repositoryPath: string
@@ -66,6 +67,7 @@ export default function PullRequestListItem({
             baseRefName={baseRefName}
             headRefName={headRefName}
             rebaseFailed={rebaseMutation.data?.result === 'FAILED_TO_REBASE'}
+            mergeable={mergeable}
           />
           {match(rebaseMutation.data)
             .with(

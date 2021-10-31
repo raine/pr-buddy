@@ -81,6 +81,14 @@ const StatusContext = z.object({
 
 export type StatusContext = z.infer<typeof StatusContext>
 
+const MergeableStatus = z.union([
+  z.literal('UNKNOWN'),
+  z.literal('MERGEABLE'),
+  z.literal('CONFLICTING')
+])
+
+export type MergeableStatus = z.infer<typeof MergeableStatus>
+
 const LatestPullRequestsStatuses = z.array(
   z.object({
     title: z.string(),
@@ -92,11 +100,7 @@ const LatestPullRequestsStatuses = z.array(
     number: z.number(),
     headRefName: z.string(),
     baseRefName: z.string(),
-    mergeable: z.union([
-      z.literal('UNKNOWN'),
-      z.literal('MERGEABLE'),
-      z.literal('CONFLICTING')
-    ]),
+    mergeable: MergeableStatus,
     commit: z.object({
       commitUrl: z.string().url(),
       status: z.union([
