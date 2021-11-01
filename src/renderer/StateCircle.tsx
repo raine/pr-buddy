@@ -38,7 +38,7 @@ function Cross({ className }: { className?: string }) {
   )
 }
 
-type State = 'SUCCESS' | 'FAILURE' | 'PENDING' | 'UNKNOWN'
+type State = 'SUCCESS' | 'FAILURE' | 'PENDING' | 'UNKNOWN' | 'ERROR'
 type StateCircleProps = {
   state: State
   className?: string
@@ -48,7 +48,7 @@ type StateCircleProps = {
 function StateCircleIcon({ state, className, pulse = true }: StateCircleProps) {
   const color = match(state)
     .with('SUCCESS', () => 'bg-emerald-500')
-    .with('FAILURE', () => 'bg-red-500')
+    .with('FAILURE', 'ERROR', () => 'bg-red-500')
     .with('PENDING', () => 'bg-amber-500')
     .otherwise(() => 'bg-gray-400')
 
@@ -79,7 +79,7 @@ const Tooltip = ({
   const className = 'mr-2'
   const symbol = match(state)
     .with('SUCCESS', () => <Checkmark className={className} />)
-    .with('FAILURE', () => <Cross className={className} />)
+    .with('FAILURE', 'ERROR', () => <Cross className={className} />)
     .with('PENDING', () => (
       <StateCircleIcon className={className} state="PENDING" pulse={false} />
     ))

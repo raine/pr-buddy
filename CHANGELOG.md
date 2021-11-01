@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1 (Unreleased)
+
+- Bugfix: Handle GitHub commit status where a build is terminated.
+
 ## 1.1.0
 
 - Bugfix: Pop stash, if any, after failed rebase.

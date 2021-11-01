@@ -28,7 +28,8 @@ export const getUser = (gql: GQL): Promise<GithubUser> =>
 const StatusState = z.union([
   z.literal('FAILURE'),
   z.literal('SUCCESS'),
-  z.literal('PENDING')
+  z.literal('PENDING'),
+  z.literal('ERROR')
 ])
 export type StatusState = z.infer<typeof StatusState>
 
