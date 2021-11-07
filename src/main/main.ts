@@ -1,19 +1,5 @@
-import 'core-js/stable'
-import { app, BrowserWindow, shell } from 'electron'
-import log from 'electron-log'
-import path from 'path'
-import querystring from 'querystring'
-import 'regenerator-runtime/runtime'
-import { InitData } from '../renderer/renderer'
-import './api'
-import './fix-dev-user-data'
-import buildMenu from './menu'
-import { getAssetPath, resolveHtmlPath } from './util'
-import * as settings from './settings'
-import { AppState } from '../renderer/App'
 import Debug from 'debug'
-import { fileExists } from './fs'
-import { HOMEBREW_GIT_PATH } from './git'
+import log from 'electron-log'
 
 // Send `debug` output to /Users/$USER/Library/Logs/PR\ Buddy/main.log (on Mac)
 if (process.env.NODE_ENV !== 'development') {
@@ -24,6 +10,21 @@ if (process.env.NODE_ENV !== 'development') {
 log.catchErrors({
   showDialog: true
 })
+
+import 'core-js/stable'
+import { app, BrowserWindow, shell } from 'electron'
+import path from 'path'
+import querystring from 'querystring'
+import 'regenerator-runtime/runtime'
+import { InitData } from '../renderer/renderer'
+import './api'
+import './fix-dev-user-data'
+import buildMenu from './menu'
+import { getAssetPath, resolveHtmlPath } from './util'
+import * as settings from './settings'
+import { AppState } from '../renderer/App'
+import { fileExists } from './fs'
+import { HOMEBREW_GIT_PATH } from './git'
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support')
