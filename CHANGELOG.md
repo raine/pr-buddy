@@ -3,6 +3,7 @@
 ## 1.1.1 (Unreleased)
 
 - Bugfix: Handle GitHub commit status where a build is terminated.
+- Sort GitHub checks/statuses by start/creation time.
 
 ## 1.1.0
 

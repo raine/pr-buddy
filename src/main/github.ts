@@ -67,13 +67,15 @@ const CheckRun = z.object({
   summary: z.string().nullable(),
   title: z.string().nullable(),
   conclusion: CheckConclusionState,
-  status: CheckStatusState
+  status: CheckStatusState,
+  startedAt: z.string()
 })
 
 export type CheckRun = z.infer<typeof CheckRun>
 
 const StatusContext = z.object({
   id: z.string(),
+  createdAt: z.string(),
   state: StatusState,
   targetUrl: z.string().url().nullable(),
   description: z.string(),
@@ -151,6 +153,7 @@ query($q: String!) {
                   state
                   contexts {
                     id
+                    createdAt
                     state
                     targetUrl
                     description
@@ -176,7 +179,8 @@ query($q: String!) {
                         title
                         url
                         conclusion
-                        status
+                        status,
+                        startedAt
                       }
                     }
                   }
