@@ -27,19 +27,19 @@ const Badge = ({
 )
 
 const Conflicts = () => (
-  <Badge className="text-amber-600 border-orange-100">Conflicts</Badge>
+  <Badge className="text-amber-600 border-orange-200">Conflicts</Badge>
 )
 
 const RemoteBranchUpToDate = ({
   baseRefName
 }: Pick<PullRequestBranchStatusProps, 'baseRefName'>) => (
-  <Badge className="text-green-600 border-green-100">Up to date</Badge>
+  <Badge className="text-green-600 border-green-200">Up to date</Badge>
 )
 
 const RemoteBranchOutOfDate = ({
   baseRefName
 }: Pick<PullRequestBranchStatusProps, 'baseRefName'>) => (
-  <Badge className="text-gray-600 border-gray-100">Out of date</Badge>
+  <Badge className="text-gray-600 border-gray-200">Out of date</Badge>
 )
 
 const Progress = ({ children }: { children: React.ReactNode }) => (
