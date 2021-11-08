@@ -7,7 +7,7 @@
 - While rebasing, if possible, automatically fix conflicts in `yarn.lock` and
   `.pnp.cjs` by running yarn.
 
-## 1.1.0
+## 1.1.0 (01.11.2021)
 
 - Bugfix: Pop stash, if any, after failed rebase.
 - Show whether PR has conflicts or is mergeable.
@@ -17,13 +17,13 @@
 - Use homebrew (and hopefully newer than the mac default) version of git, if
   available.
 
-## 1.0.2
+## 1.0.2 (28.10.2021)
 
 - New custom title bar with separate loading indicator.
 - UI polish.
 - Update pull requests on window focus.
 
-## 1.0.1
+## 1.0.1 (26.10.2021)
 
 - Use GitHub Enterprise specific URL in API key onboarding screen, if
   applicable.
@@ -31,6 +31,6 @@
   HEAD.
 - When quitting, save the last opened repo to be opened in next start.
 
-## 1.0.0
+## 1.0.0 (25.10.2021)
 
 - Initial release
