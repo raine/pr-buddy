@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.1.1 (Unreleased)
+## 1.2.0 (08.11.2021)
 
 - Bugfix: Handle GitHub commit status where a build is terminated.
 - Sort GitHub checks/statuses by start/creation time.
