@@ -27,6 +27,7 @@ export type RebaseStatusMessageData =
         | 'GIT_FETCH'
         | 'REBASE'
         | 'FAILED_TO_REBASE'
+        | 'YARN_INSTALL'
     }
   | {
       type: 'REBASE'

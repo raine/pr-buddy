@@ -9,15 +9,27 @@ export type ExecResult = {
   stderr: string
 }
 
+type ExecOptions = {
+  env?: NodeJS.ProcessEnv
+  cwd?: string
+}
+
 export const exec = (
   command: string,
-  env?: NodeJS.ProcessEnv
+  opts: ExecOptions = {
+    env: {},
+    cwd: process.cwd()
+  }
 ): Promise<ExecResult> =>
   new Promise((resolve) => {
     debug('exec:', command)
     cp.exec(
       command,
-      { env: { ...process.env, ...env }, encoding: 'utf8' },
+      {
+        cwd: opts.cwd,
+        env: { ...process.env, ...opts.env },
+        encoding: 'utf8'
+      },
       (err, stdout, stderr) => {
         const code = err ? { code: 1 } : { code: 0 }
         debug({ stdout, stderr, ...code })

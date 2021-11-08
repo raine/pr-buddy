@@ -78,6 +78,9 @@ function PullRequestBranchStatus(props: PullRequestBranchStatusProps) {
           .with({ status: 'GIT_FETCH' }, () => <>Fetching the remote...</>)
           .with({ status: 'REBASE' }, () => <>Rebasing on {baseRefName}...</>)
           .with({ status: 'GIT_PUSH' }, () => <>Pushing, with force...</>)
+          .with({ status: 'YARN_INSTALL' }, () => (
+            <>Auto-resolving conflicts with yarn...</>
+          ))
           .with(
             { status: 'REBASE_PROGRESS' },
             ({ info: { currentRebaseStep, totalRebaseSteps } }) => (

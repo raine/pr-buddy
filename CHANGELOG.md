@@ -4,6 +4,8 @@
 
 - Bugfix: Handle GitHub commit status where a build is terminated.
 - Sort GitHub checks/statuses by start/creation time.
+- While rebasing, if possible, automatically fix conflicts in `yarn.lock` and
+  `.pnp.cjs` by running yarn.
 
 ## 1.1.0
 
