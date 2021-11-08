@@ -21,5 +21,5 @@
     "outDir": "release/app/dist",
     "skipLibCheck": true
   },
-  "exclude": ["test", "release/build", "release/app/dist", "erb/dll", "raine-stuff"]
+  "exclude": ["test", "release/build", "release/app/dist", "erb/dll", "stuff"]
 }
