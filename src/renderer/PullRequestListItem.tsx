@@ -1,19 +1,10 @@
 import React from 'react'
 import { useMutation, useQueryClient } from 'react-query'
-import { match, __ } from 'ts-pattern'
 import { LocalBranchesUpToDateMap } from '../main/api'
 import { PullRequest } from '../main/github'
 import useMessages from './hooks/useMessages'
 import PullRequestBranchStatus from './PullRequestBranchStatus'
 import PullRequestChecks from './PullRequestChecks'
-
-function MonospaceOutput({ text }: { text: string }) {
-  return (
-    <div className="font-mono text-sm text-gray-600 bg-gray-50 p-1 rounded mt-1">
-      {text}
-    </div>
-  )
-}
 
 export default function PullRequestListItem({
   title,
@@ -52,15 +43,14 @@ export default function PullRequestListItem({
   })
 
   return (
-    <div className="mb-4 border-gray-150 border rounded-md p-3">
-      <div className="flex">
-        <div className="flex-grow">
-          <div className="text-md leading-snug text-gray-700 font-medium">
-            <a target="_blank" href={url}>
-              {title}{' '}
-              <span className="font-normal text-gray-500">#{number}</span>
-            </a>
-          </div>
+    <div className="mb-4 border-gray-150 border rounded-md p-3 space-y-2">
+      <div className="text-md leading-snug text-gray-700 font-medium">
+        <a target="_blank" href={url}>
+          {title} <span className="font-normal text-gray-500">#{number}</span>
+        </a>
+      </div>
+      <div className="flex space-x-4">
+        <div className="flex-grow ">
           <PullRequestChecks commit={commit} />
           <PullRequestBranchStatus
             isUpToDateWithBase={isUpToDateWithBase}
@@ -69,14 +59,8 @@ export default function PullRequestListItem({
             rebaseFailed={rebaseMutation.data?.result === 'FAILED_TO_REBASE'}
             mergeable={mergeable}
           />
-          {match(rebaseMutation.data)
-            .with(
-              { result: 'FAILED_TO_REBASE', message: __.string },
-              ({ message }) => <MonospaceOutput text={message} />
-            )
-            .otherwise(() => null)}
         </div>
-        <div className="ml-5 flex flex-col flex-shrink-0 w-[9rem]">
+        <div className="flex flex-col flex-shrink-0 w-[9rem]">
           {!isUpToDateWithBase ? (
             <button
               onClick={() => rebaseMutation.mutate()}

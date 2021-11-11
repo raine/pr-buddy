@@ -4,7 +4,7 @@ import { match, not, __ } from 'ts-pattern'
 import { CheckRun, StatusContext } from '../main/github'
 import { usePopperTooltip } from 'react-popper-tooltip'
 
-function Checkmark({ className }: { className?: string }) {
+export function Checkmark({ className }: { className?: string }) {
   return (
     <svg
       viewBox="22.25 112.5 802.25 622"
@@ -21,7 +21,7 @@ function Checkmark({ className }: { className?: string }) {
   )
 }
 
-function Cross({ className }: { className?: string }) {
+export function Cross({ className }: { className?: string }) {
   return (
     <svg
       viewBox="36.626 36.626 772.883 772.883"
@@ -45,11 +45,15 @@ type StateCircleProps = {
   pulse?: boolean
 }
 
-function StateCircleIcon({ state, className, pulse = true }: StateCircleProps) {
+export function StateCircleIcon({
+  state,
+  className,
+  pulse = true
+}: StateCircleProps) {
   const color = match(state)
-    .with('SUCCESS', () => 'bg-emerald-500')
-    .with('FAILURE', 'ERROR', () => 'bg-red-500')
-    .with('PENDING', () => 'bg-amber-500')
+    .with('SUCCESS', () => 'bg-emerald-400')
+    .with('FAILURE', 'ERROR', () => 'bg-red-400')
+    .with('PENDING', () => 'bg-amber-400')
     .otherwise(() => 'bg-gray-400')
 
   return (

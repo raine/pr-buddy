@@ -12,6 +12,10 @@ module.exports = {
         gray: {
           ...colors.coolGray,
           150: '#ECEDEF'
+        },
+        green: {
+          ...colors.green,
+          200: '#bcf5d0'
         }
       },
       animation: {

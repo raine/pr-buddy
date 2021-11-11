@@ -21,7 +21,12 @@ const Badge = ({
   children: React.ReactNode
   className: string
 }) => (
-  <div className={classNames('inline-block px-2 rounded border', className)}>
+  <div
+    className={classNames(
+      'inline-block px-2 rounded border bg-white text-sm',
+      className
+    )}
+  >
     {children}
   </div>
 )
@@ -43,10 +48,10 @@ const RemoteBranchOutOfDate = ({
 )
 
 const Progress = ({ children }: { children: React.ReactNode }) => (
-  <span>
+  <div>
     <Spinner key="spinner" size={14} className="mb-[1px]" thickness={250} />
     <span className="ml-[4px]">{children}</span>
-  </span>
+  </div>
 )
 
 function PullRequestBranchStatus(props: PullRequestBranchStatusProps) {
@@ -99,15 +104,17 @@ function PullRequestBranchStatus(props: PullRequestBranchStatusProps) {
   useMessages(dispatch)
 
   return (
-    // Height 21px avoids slight movement in layout when badges change to
+    // Height 29px avoids slight movement in layout when badges change to
     // progress
-    <div className="text-gray-600 mt-2 flex h-[21px]">
-      <span className="font-semibold mr-2">Status:</span>
-      {branchStatus === 'DEFAULT' ? (
-        defaultBranchStatus
-      ) : (
-        <Progress>{branchStatus}</Progress>
-      )}
+    <div className="bg-gray-50 rounded p-2 mt-2 flex flex-row space-x-2 items-center h-[29px]">
+      <span className="text-gray-600 font-medium text-sm">Status:</span>
+      <div className="text-gray-600 text-sm">
+        {branchStatus === 'DEFAULT' ? (
+          defaultBranchStatus
+        ) : (
+          <Progress>{branchStatus}</Progress>
+        )}
+      </div>
     </div>
   )
 }
