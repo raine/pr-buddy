@@ -18,7 +18,7 @@ function PullRequestChecks({ commit, className }: PullRequestChecksProps) {
         {match(commit)
           .with({ status: not(__.nullish) }, (commit) => {
             return sortBy(commit.status.contexts, (context) =>
-              Date.parse(context.createdAt)
+              context.context.toLowerCase()
             ).map((context) => (
               <PullRequestCheckRow key={context.context} {...context} />
             ))
