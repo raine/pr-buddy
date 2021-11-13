@@ -5,6 +5,7 @@ import { MessageData } from '../main/api'
 import { MergeableStatus } from '../main/github'
 import useMessages from './hooks/useMessages'
 import Spinner from './Spinner'
+import Tooltip from './Tooltip'
 
 type PullRequestBranchStatusProps = {
   isUpToDateWithBase: boolean
@@ -14,35 +15,89 @@ type PullRequestBranchStatusProps = {
   mergeable: MergeableStatus
 }
 
-const Badge = ({
-  children,
-  className
-}: {
+type BadgeProps = {
   children: React.ReactNode
   className: string
-}) => (
-  <div
-    className={classNames(
-      'inline-block px-2 rounded bg-white text-sm shadow-sm',
-      className
-    )}
-  >
-    {children}
-  </div>
+}
+
+const Badge = React.forwardRef(
+  ({ children, className, ...restProps }: BadgeProps, ref) => (
+    <div
+      //@ts-ignore
+      ref={ref}
+      className={classNames(
+        'inline-block px-2 rounded bg-white text-sm shadow-sm mr-1.5',
+        className
+      )}
+      {...restProps}
+    >
+      {children}
+    </div>
+  )
 )
 
-const Conflicts = () => <Badge className="text-amber-600">Conflicts</Badge>
+const Conflicts = ({
+  baseRefName
+}: Pick<PullRequestBranchStatusProps, 'baseRefName'>) => (
+  <Tooltip
+    trigger="hover"
+    placement="bottom"
+    content={
+      <>
+        The branch has conflicts against{' '}
+        <span className="font-semibold">{baseRefName}</span> and has to be
+        rebased manually
+      </>
+    }
+  >
+    {({ setReferenceElement, ...bind }) => (
+      <Badge className="text-amber-600" ref={setReferenceElement} {...bind}>
+        Conflicts
+      </Badge>
+    )}
+  </Tooltip>
+)
 
 const RemoteBranchUpToDate = ({
   baseRefName
 }: Pick<PullRequestBranchStatusProps, 'baseRefName'>) => (
-  <Badge className="text-emerald-600">Up to date</Badge>
+  <Tooltip
+    trigger="hover"
+    placement="bottom"
+    content={
+      <>
+        The branch up to date with{' '}
+        <span className="font-semibold">{baseRefName}</span>
+      </>
+    }
+  >
+    {({ setReferenceElement, ...bind }) => (
+      <Badge className="text-emerald-600" ref={setReferenceElement} {...bind}>
+        Up to date
+      </Badge>
+    )}
+  </Tooltip>
 )
 
 const RemoteBranchOutOfDate = ({
   baseRefName
 }: Pick<PullRequestBranchStatusProps, 'baseRefName'>) => (
-  <Badge className="text-gray-600">Out of date</Badge>
+  <Tooltip
+    trigger="hover"
+    placement="bottom"
+    content={
+      <>
+        The branch is out of date with{' '}
+        <span className="font-semibold">{baseRefName}</span>
+      </>
+    }
+  >
+    {({ setReferenceElement, ...bind }) => (
+      <Badge className="text-gray-600" ref={setReferenceElement} {...bind}>
+        Out of date
+      </Badge>
+    )}
+  </Tooltip>
 )
 
 const Progress = ({ children }: { children: React.ReactNode }) => (
@@ -57,14 +112,16 @@ function PullRequestBranchStatus(props: PullRequestBranchStatusProps) {
   const defaultBranchStatus = props.rebaseFailed ? (
     <span>Rebase failed! Manual rebase required</span>
   ) : (
-    <div className="space-x-1.5">
+    <div>
       {props.isUpToDateWithBase ? (
         <RemoteBranchUpToDate baseRefName={baseRefName} />
       ) : (
         <RemoteBranchOutOfDate baseRefName={baseRefName} />
       )}
 
-      {props.mergeable === 'CONFLICTING' ? <Conflicts /> : null}
+      {props.mergeable === 'CONFLICTING' ? (
+        <Conflicts baseRefName={baseRefName} />
+      ) : null}
     </div>
   )
 

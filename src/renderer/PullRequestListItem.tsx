@@ -5,6 +5,7 @@ import { PullRequest } from '../main/github'
 import useMessages from './hooks/useMessages'
 import PullRequestBranchStatus from './PullRequestBranchStatus'
 import PullRequestChecks from './PullRequestChecks'
+import Tooltip from './Tooltip'
 
 export default function PullRequestListItem({
   title,
@@ -61,13 +62,28 @@ export default function PullRequestListItem({
           />
         </div>
         <div className="flex flex-col flex-shrink-0 w-[9rem]">
-          <button
-            onClick={() => rebaseMutation.mutate()}
-            className="px-5 bg-gray-50 hover:bg-gray-100 pt-2 pb-3 transition active:shadow-inner rounded-md text-normal border shadow-sm text-gray-600 border-gray-300 disabled:text-gray-300 disabled:border-gray-200 disabled:pointer-events-none"
-            disabled={rebaseMutation.isLoading || isUpToDateWithBase}
+          <Tooltip
+            trigger="hover"
+            placement="bottom"
+            content={<>The branch is already up-to-date</>}
           >
-            Rebase on latest master
-          </button>
+            {({ setReferenceElement, ...bind }) => (
+              // button has pointer events disabled when disabled, so the
+              // wrapping div is needed for tooltip events
+              <div
+                ref={setReferenceElement}
+                {...(isUpToDateWithBase ? bind : {})}
+              >
+                <button
+                  onClick={() => rebaseMutation.mutate()}
+                  className="px-5 bg-gray-50 hover:bg-gray-100 pt-2 pb-3 transition active:shadow-inner rounded-md text-normal border shadow-sm text-gray-600 border-gray-300 disabled:text-gray-300 disabled:border-gray-200 disabled:pointer-events-none"
+                  disabled={rebaseMutation.isLoading || isUpToDateWithBase}
+                >
+                  Rebase on latest master
+                </button>
+              </div>
+            )}
+          </Tooltip>
         </div>
       </div>
     </div>
