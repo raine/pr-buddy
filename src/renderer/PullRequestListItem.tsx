@@ -61,15 +61,13 @@ export default function PullRequestListItem({
           />
         </div>
         <div className="flex flex-col flex-shrink-0 w-[9rem]">
-          {!isUpToDateWithBase ? (
-            <button
-              onClick={() => rebaseMutation.mutate()}
-              className="px-5 bg-gray-50 hover:bg-gray-100 pt-2 pb-3 transition active:shadow-inner rounded-md text-normal border shadow-sm text-gray-600 border-gray-300 disabled:opacity-50 disabled:pointer-events-none"
-              disabled={rebaseMutation.isLoading}
-            >
-              Rebase on latest master
-            </button>
-          ) : null}
+          <button
+            onClick={() => rebaseMutation.mutate()}
+            className="px-5 bg-gray-50 hover:bg-gray-100 pt-2 pb-3 transition active:shadow-inner rounded-md text-normal border shadow-sm text-gray-600 border-gray-300 disabled:text-gray-300 disabled:border-gray-200 disabled:pointer-events-none"
+            disabled={rebaseMutation.isLoading || isUpToDateWithBase}
+          >
+            Rebase on latest master
+          </button>
         </div>
       </div>
     </div>
