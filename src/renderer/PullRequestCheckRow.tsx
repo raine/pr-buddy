@@ -1,3 +1,4 @@
+import classNames from 'classnames'
 import React from 'react'
 import { match } from 'ts-pattern'
 import { StatusContext } from '../main/github'
@@ -26,7 +27,13 @@ export function PullRequestCheckRow({
       : null
 
   const row = (
-    <div className="border border-gray-150 py-1 px-2 rounded flex flex-row space-x-1 bg-white">
+    <div
+      className={classNames(
+        'border border-gray-200 py-1 px-2 rounded flex flex-row space-x-1 bg-white',
+        { ['!border-red-200']: state === 'FAILURE' },
+        { ['!border-amber-200']: state === 'PENDING' }
+      )}
+    >
       <div className="flex flex-row overflow-hidden flex-grow items-center space-x-[1px]">
         {symbol}
         <div className="overflow-ellipsis whitespace-nowrap overflow-hidden text-gray-800 text-sm flex-grow">
@@ -34,7 +41,7 @@ export function PullRequestCheckRow({
         </div>
       </div>
       {duration ? (
-        <div className="text-sm text-gray-500 whitespace-nowrap">
+        <div className="text-sm text-amber-500 whitespace-nowrap">
           {Math.round(duration)}m
         </div>
       ) : null}
