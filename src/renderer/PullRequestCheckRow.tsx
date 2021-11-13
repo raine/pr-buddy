@@ -6,7 +6,8 @@ import { Checkmark, Cross, StateCircleIcon } from './StateCircle'
 export function PullRequestCheckRow({
   context,
   state,
-  targetUrl
+  targetUrl,
+  createdAt
 }: StatusContext) {
   const symbolClassName = 'flex-shrink-0 mr-2'
   const symbol = match(state)
@@ -19,6 +20,11 @@ export function PullRequestCheckRow({
       <StateCircleIcon className={symbolClassName} state="UNKNOWN" />
     ))
 
+  const duration =
+    state === 'PENDING'
+      ? (Date.now() - Date.parse(createdAt)) / 1000 / 60
+      : null
+
   const row = (
     <div className="border border-gray-150 py-1 px-2 rounded flex flex-row space-x-1 bg-white">
       <div className="flex flex-row overflow-hidden flex-grow items-center space-x-[1px]">
@@ -27,7 +33,11 @@ export function PullRequestCheckRow({
           {context}
         </div>
       </div>
-      {/*}<div className="text-sm text-gray-500 whitespace-nowrap">1m</div>{*/}
+      {duration ? (
+        <div className="text-sm text-gray-500 whitespace-nowrap">
+          {Math.round(duration)}m
+        </div>
+      ) : null}
     </div>
   )
 
