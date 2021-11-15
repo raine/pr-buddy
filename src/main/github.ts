@@ -68,7 +68,8 @@ const CheckRun = z.object({
   title: z.string().nullable(),
   conclusion: CheckConclusionState,
   status: CheckStatusState,
-  startedAt: z.string()
+  startedAt: z.string(),
+  completedAt: z.string().nullable()
 })
 
 export type CheckRun = z.infer<typeof CheckRun>
@@ -180,7 +181,8 @@ query($q: String!) {
                         url
                         conclusion
                         status,
-                        startedAt
+                        startedAt,
+                        completedAt
                       }
                     }
                   }

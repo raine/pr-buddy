@@ -1,15 +1,23 @@
 import classNames from 'classnames'
 import React from 'react'
 import { match } from 'ts-pattern'
-import { StatusContext } from '../main/github'
 import { Checkmark, Cross, StateCircleIcon } from './StateCircle'
 
+export type State = 'SUCCESS' | 'FAILURE' | 'PENDING' | 'UNKNOWN' | 'ERROR'
+
+type PullRequestCheckRowProps = {
+  name: string
+  duration: number | null
+  state: State
+  url: string | null
+}
+
 export function PullRequestCheckRow({
-  context,
   state,
-  targetUrl,
-  createdAt
-}: StatusContext) {
+  name,
+  duration,
+  url
+}: PullRequestCheckRowProps) {
   const symbolClassName = 'flex-shrink-0 mr-2'
   const symbol = match(state)
     .with('SUCCESS', () => <Checkmark className={symbolClassName} />)
@@ -20,11 +28,6 @@ export function PullRequestCheckRow({
     .otherwise(() => (
       <StateCircleIcon className={symbolClassName} state="UNKNOWN" />
     ))
-
-  const duration =
-    state === 'PENDING'
-      ? (Date.now() - Date.parse(createdAt)) / 1000 / 60
-      : null
 
   const row = (
     <div
@@ -37,19 +40,23 @@ export function PullRequestCheckRow({
       <div className="flex flex-row overflow-hidden flex-grow items-center space-x-[2px]">
         {symbol}
         <div className="overflow-ellipsis whitespace-nowrap overflow-hidden text-gray-800 text-sm flex-grow">
-          {context}
+          {name}
         </div>
       </div>
-      {duration ? (
-        <div className="text-sm text-amber-500 whitespace-nowrap">
-          {Math.round(duration)}m
+      {duration !== null ? (
+        <div
+          className={classNames('text-sm text-gray-500 whitespace-nowrap', {
+            'text-amber-500': state === 'PENDING'
+          })}
+        >
+          {Math.round(duration / 1000 / 60)}m
         </div>
       ) : null}
     </div>
   )
 
-  return targetUrl ? (
-    <a href={targetUrl} target="_blank">
+  return url ? (
+    <a href={url} target="_blank">
       {row}
     </a>
   ) : (
