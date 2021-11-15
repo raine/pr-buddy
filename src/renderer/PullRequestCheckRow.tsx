@@ -34,7 +34,7 @@ export function PullRequestCheckRow({
         { ['!border-amber-200']: state === 'PENDING' }
       )}
     >
-      <div className="flex flex-row overflow-hidden flex-grow items-center space-x-[1px]">
+      <div className="flex flex-row overflow-hidden flex-grow items-center space-x-[2px]">
         {symbol}
         <div className="overflow-ellipsis whitespace-nowrap overflow-hidden text-gray-800 text-sm flex-grow">
           {context}
