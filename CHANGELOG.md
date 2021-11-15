@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.0 (17.11.2021)
+
+- New more detailed checks UI.
+- Tooltips shown on hover on various UI elements to provide more information.
+
 ## 1.2.0 (08.11.2021)
 
 - Bugfix: Handle GitHub commit status where a build is terminated.
