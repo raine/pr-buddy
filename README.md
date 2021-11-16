@@ -21,3 +21,7 @@ A GUI tool for helping with GitHub PRs and stuff. It's Electron.
 ## Download
 
 See https://github.com/raine/pr-buddy/releases (Mac only for now)
+
+## Changelog
+
+See [CHANGELOG.md](https://github.com/raine/pr-buddy/blob/master/CHANGELOG.md)
