@@ -51,7 +51,7 @@ export default function PullRequestListItem({
         </a>
       </div>
       <div className="flex space-x-4">
-        <div className="flex-grow ">
+        <div className="flex-grow space-y-2">
           <PullRequestChecks commit={commit} />
           <PullRequestBranchStatus
             isUpToDateWithBase={isUpToDateWithBase}

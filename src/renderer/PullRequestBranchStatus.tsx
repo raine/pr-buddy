@@ -161,7 +161,7 @@ function PullRequestBranchStatus(props: PullRequestBranchStatusProps) {
   return (
     // Height 29px avoids slight movement in layout when badges change to
     // progress
-    <div className="bg-gray-50 rounded p-2 mt-2 flex flex-row space-x-2 items-center h-[29px]">
+    <div className="bg-gray-50 rounded p-2 flex flex-row space-x-2 items-center h-[29px]">
       <span className="text-gray-600 font-medium text-sm">Status:</span>
       <div className="text-gray-600 text-sm">
         {branchStatus === 'DEFAULT' ? (
