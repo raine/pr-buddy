@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -euox pipefail
 
 version_arg="$1"
 root=$(git rev-parse --show-toplevel)
@@ -9,6 +9,7 @@ git diff --quiet || (echo 'Dirty worktree' && exit 1)
 rm -rf "$root"/release/build
 
 yarn test
+yarn lint
 
 cd "$root"/release/app
 version_before="v$(jq -r .version package.json)"
