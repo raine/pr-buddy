@@ -9,12 +9,12 @@ A GUI tool for helping with GitHub PRs and stuff. It's Electron.
 
 ## Screenshot
 
-<img width="630" src="https://user-images.githubusercontent.com/11027/139166219-0ecc3718-88d6-4c90-9506-405c35ec2a5d.png">
+<img width="630" src="https://user-images.githubusercontent.com/11027/142073854-2b4bb527-4016-4212-a29f-2feb3e37584d.png">
 
 ## Features
 
 - Rebase PRs against the latest version of the base branch with a click
-- Resolve just yarn.lock conflicts automatically
+- Resolve conflicts in yarn.lock only automatically
 - See how PR status checks are doing
 - Supports enterprise GitHub
 
