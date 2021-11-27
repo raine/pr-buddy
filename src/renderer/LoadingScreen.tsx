@@ -10,7 +10,7 @@ function LoadingScreen() {
   })
 
   return (
-    <div className="flex items-center justify-center h-[90vh]">
+    <div className="flex items-center justify-center h-[90vh] drag">
       <animated.div className="text-3xl text-gray-400" style={fadeStyle}>
         Loading...
       </animated.div>
