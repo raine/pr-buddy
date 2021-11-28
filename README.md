@@ -5,7 +5,9 @@
   # PR Buddy
 </div>
 
-A GUI tool for helping with GitHub PRs and stuff. It's Electron.
+Use case: The project you're working on requires PR branches to be up-to-date
+with their base branch before merging. PR Buddy makes it easier to keep your
+branches up-to-date and make sure they pass CI checks.
 
 ## Screenshot
 
@@ -13,10 +15,12 @@ A GUI tool for helping with GitHub PRs and stuff. It's Electron.
 
 ## Features
 
-- Rebase PRs against the latest version of the base branch with a click of a button
+- Rebase PR brances against the latest version of their base branch with a click
+  of a button
 - Resolve conflicts in yarn.lock only automatically
 - See how PR status checks are doing
-- Be notified when PR branch goes out of date with its base branch
+- Be notified when PR branch goes out of date with its base branch or has a
+  failing check
 - Supports enterprise GitHub
 
 ## Download
