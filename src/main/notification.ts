@@ -2,7 +2,9 @@ import { select, match } from 'ts-pattern'
 import { BrowserWindow, Notification as ElectronNotification } from 'electron'
 import { PullRequestChange } from './track-pull-request-changes'
 
-type Notification = Pick<ElectronNotification, 'title' | 'body'>
+type Notification = Pick<ElectronNotification, 'title' | 'body'> & {
+  subtitle?: ElectronNotification['subtitle']
+}
 
 export function prChangeToNotification(
   change: PullRequestChange
@@ -11,6 +13,11 @@ export function prChangeToNotification(
     .with({ type: 'PR_OUTDATED', pullRequest: select() }, (pr) => ({
       title: `Pull request out of date with ${pr.baseRefName}`,
       body: `${pr.title} #${pr.number}`
+    }))
+    .with({ type: 'CHECK_FAILED' }, (change) => ({
+      title: `Check failed`,
+      subtitle: `${change.pullRequest.title} #${change.pullRequest.number}`,
+      body: `${change.failedCheckName}`
     }))
     .run()
 }

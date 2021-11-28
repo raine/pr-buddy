@@ -133,7 +133,11 @@ export async function fetchPullRequests(
       {}
     )
 
-    trackPullRequestChanges(pullRequests, localBranchesUpToDateMap)
+    trackPullRequestChanges(
+      repositoryPath,
+      pullRequests,
+      localBranchesUpToDateMap
+    )
       .map(prChangeToNotification)
       .forEach((notification) => {
         showNotification(this, notification)
