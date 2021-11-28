@@ -13,9 +13,10 @@ A GUI tool for helping with GitHub PRs and stuff. It's Electron.
 
 ## Features
 
-- Rebase PRs against the latest version of the base branch with a click
+- Rebase PRs against the latest version of the base branch with a click of a button
 - Resolve conflicts in yarn.lock only automatically
 - See how PR status checks are doing
+- Be notified when PR branch goes out of date with its base branch
 - Supports enterprise GitHub
 
 ## Download

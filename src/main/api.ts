@@ -15,7 +15,9 @@ import {
   makeGqlClient,
   PullRequest
 } from './github'
+import { prChangeToNotification, showNotification } from './notification'
 import * as settings from './settings'
+import { trackPullRequestChanges } from './track-pull-request-changes'
 
 export type RebaseStatusMessageData =
   | {
@@ -130,6 +132,12 @@ export async function fetchPullRequests(
       }),
       {}
     )
+
+    trackPullRequestChanges(pullRequests, localBranchesUpToDateMap)
+      .map(prChangeToNotification)
+      .forEach((notification) => {
+        showNotification(this, notification)
+      })
 
     return {
       result: 'OK',
