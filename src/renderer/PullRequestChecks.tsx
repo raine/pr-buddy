@@ -1,9 +1,10 @@
 import classNames from 'classnames'
 import { match, not, __ } from 'ts-pattern'
 import { sortBy } from 'lodash'
-import React from 'react'
+import React, { useState } from 'react'
 import { CheckRun, PullRequest, StatusContext } from '../main/github'
 import PullRequestCheckRow, { State } from './PullRequestCheckRow'
+import { useInterval } from 'react-use'
 
 type PullRequestChecksProps = {
   commit: PullRequest['commit']
@@ -18,10 +19,15 @@ const checkRunToBuildState = ({ status, conclusion }: CheckRun): State =>
     .with(['COMPLETED', 'STARTUP_FAILURE'], () => 'ERROR' as const)
     .otherwise(() => 'UNKNOWN' as const)
 
-const statusContextToCheckRow = (context: StatusContext) => {
+const StatusContextCheckRow = (context: StatusContext) => {
   const { state, createdAt, targetUrl: url, context: title } = context
-  const duration =
+  const calcDuration = () =>
     state === 'PENDING' ? Date.now() - Date.parse(createdAt) : null
+  const [duration, setDuration] = useState<number | null>(calcDuration())
+
+  useInterval(() => {
+    setDuration(calcDuration())
+  }, 1000)
 
   return (
     <PullRequestCheckRow
@@ -34,11 +40,16 @@ const statusContextToCheckRow = (context: StatusContext) => {
   )
 }
 
-const checkRunToCheckRow = (checkRun: CheckRun) => {
+const CheckRunCheckRow = (checkRun: CheckRun) => {
   const { id, detailsUrl, name, startedAt, completedAt } = checkRun
   const state = checkRunToBuildState(checkRun)
-  const duration =
+  const calcDuration = () =>
     (completedAt ? Date.parse(completedAt) : Date.now()) - Date.parse(startedAt)
+  const [duration, setDuration] = useState(calcDuration())
+
+  useInterval(() => {
+    setDuration(calcDuration())
+  }, 1000)
 
   return (
     <PullRequestCheckRow
@@ -59,14 +70,18 @@ function PullRequestChecks({ commit, className }: PullRequestChecksProps) {
         {commit.status?.contexts
           ? sortBy(commit.status.contexts, (context) =>
               context.context.toLowerCase()
-            ).map((context) => statusContextToCheckRow(context))
+            ).map((context) => (
+              <StatusContextCheckRow key={context.id} {...context} />
+            ))
           : null}
 
         {commit.flattenedCheckRuns
           ? sortBy(
               commit.flattenedCheckRuns,
               (checkRun) => checkRun.startedAt
-            ).map((checkRun) => checkRunToCheckRow(checkRun))
+            ).map((checkRun) => (
+              <CheckRunCheckRow key={checkRun.id} {...checkRun} />
+            ))
           : null}
       </div>
     </div>

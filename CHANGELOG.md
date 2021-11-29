@@ -5,6 +5,7 @@
 - Make loading screen draggable.
 - Show a notification when a PR branch becomes out of of date with base branch.
 - Show a notification when a status check in PR fails.
+- Bugfix: Update PR status check durations properly.
 
 ## 1.3.0 (17.11.2021)
 
