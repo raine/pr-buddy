@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.4.0 (Unreleased)
+## 1.4.0 (30.11.2021)
 
 - Make loading screen draggable.
 - Show a notification when a PR branch becomes out of of date with base branch.
